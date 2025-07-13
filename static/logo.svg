@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="64"
+   height="64"
+   viewBox="0 0 64 64"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
+   sodipodi:docname="logo.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:document-units="px"
+     inkscape:zoom="9.2221485"
+     inkscape:cx="16.427842"
+     inkscape:cy="35.512332"
+     inkscape:window-width="2752"
+     inkscape:window-height="1124"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <rect
+       x="34"
+       y="34"
+       width="20"
+       height="20"
+       id="rect6" />
+    <rect
+       x="10"
+       y="34"
+       width="20"
+       height="20"
+       id="rect5" />
+    <rect
+       x="34"
+       y="10"
+       width="20"
+       height="20"
+       id="rect4" />
+    <rect
+       x="10"
+       y="10"
+       width="20"
+       height="17.77643"
+       id="rect3" />
+    <rect
+       x="10"
+       y="10"
+       width="20"
+       height="17.77643"
+       id="rect3-1" />
+  </defs>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#540354;fill-opacity:1"
+       id="rect1"
+       width="64"
+       height="64"
+       x="0"
+       y="0" />
+    <rect
+       style="fill:#a43606;fill-opacity:1;stroke-width:1.00157;stroke-dasharray:none"
+       id="rect2"
+       width="20"
+       height="20"
+       x="10"
+       y="10"
+       inkscape:label="sq1"
+       ry="2" />
+    <rect
+       style="fill:#a47606;fill-opacity:1;stroke-width:1.00157;stroke-dasharray:none"
+       id="rect2-3"
+       width="20"
+       height="20"
+       x="34"
+       y="10"
+       inkscape:label="sq1"
+       ry="2" />
+    <rect
+       style="fill:#a4066f;fill-opacity:1;stroke-width:1.00157;stroke-dasharray:none"
+       id="rect2-1"
+       width="20"
+       height="20"
+       x="10"
+       y="34"
+       inkscape:label="sq1"
+       ry="2" />
+    <rect
+       style="fill:#7207ca;fill-opacity:1;stroke-width:1.00157;stroke-dasharray:none"
+       id="rect2-3-2"
+       width="20"
+       height="20"
+       x="34"
+       y="34"
+       inkscape:label="sq1"
+       ry="2" />
+    <text
+       xml:space="preserve"
+       id="text2"
+       style="font-size:14.6667px;text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect3);shape-padding:0;fill:#ffffff;fill-opacity:0.615824;stroke-width:1.00157;stroke-dasharray:none"
+       x="2.8320007"
+       y="0"
+       transform="translate(0,1.566305)"><tspan
+         x="15.610016"
+         y="23.576168"
+         id="tspan2"><tspan
+           style="font-weight:bold;font-family:'Adwaita Sans';-inkscape-font-specification:'Adwaita Sans'"
+           id="tspan1">2</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       id="text3"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.6667px;font-family:'Adwaita Sans';-inkscape-font-specification:'Adwaita Sans';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect4);fill:#ffffff;fill-opacity:0.615824;stroke-width:1.00157;stroke-dasharray:none"
+       transform="translate(0,1.566305)"><tspan
+         x="39.230458"
+         y="23.576168"
+         id="tspan7"><tspan
+           style="font-weight:bold"
+           id="tspan3">0</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       id="text4"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.6667px;font-family:'Adwaita Sans';-inkscape-font-specification:'Adwaita Sans';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect5);fill:#ffffff;fill-opacity:0.615824;stroke-width:1.00157;stroke-dasharray:none"
+       transform="translate(0,1.3944296)"><tspan
+         x="15.183908"
+         y="47.576168"
+         id="tspan9"><tspan
+           style="font-weight:bold"
+           id="tspan8">4</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       id="text5"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.6667px;font-family:'Adwaita Sans';-inkscape-font-specification:'Adwaita Sans';text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect6);fill:#ffffff;fill-opacity:0.615824;stroke-width:1.00157;stroke-dasharray:none"
+       transform="translate(0,1.566305)"><tspan
+         x="39.495432"
+         y="47.576168"
+         id="tspan11"><tspan
+           style="font-weight:bold"
+           id="tspan10">8</tspan></tspan></text>
+  </g>
+</svg>

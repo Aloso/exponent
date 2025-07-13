@@ -1,0 +1,39 @@
+@use 'sass:math';
+@use 'sass:list';
+
+@mixin focus-background($color) {
+	outline: none;
+	transition: 0.2s;
+
+	&:hover,
+	&:focus {
+		background-color: $color;
+	}
+}
+
+@function move-shadows($n, $colors) {
+	@debug $n $colors;
+	$res: ();
+	@for $i from 1 through list.length($colors) {
+		$to-append: 0 #{math.min($i, $n) * -10px} 0 #{list.nth($colors, $i)};
+		$res: list.append($res, $to-append, $separator: comma);
+	}
+	@return $res;
+}
+
+@mixin fade-shadows-up($name, $black, $colors...) {
+	@keyframes #{$name} {
+		0% {
+			text-shadow:
+				0 0 3px $black,
+				move-shadows(0, $colors);
+		}
+		@for $i from 1 through list.length($colors) {
+			#{math.div(100%, list.length($colors)) * $i} {
+				text-shadow:
+					0 0 3px $black,
+					move-shadows($i, $colors);
+			}
+		}
+	}
+}

@@ -1,0 +1,32 @@
+:root {
+	margin: 0;
+	padding: 0;
+	background-color: #540354;
+	color: white;
+	font-family: Outfit, sans-serif;
+	font-size: min(150%, 100% + 0.4vw);
+}
+
+body {
+	margin: 0;
+	padding: 0;
+}
+
+button,
+.button {
+	border: none;
+	margin: 0;
+	padding: 0 1rem;
+	border-radius: 0.3rem;
+	color: inherit;
+	font-family: inherit;
+	font-size: inherit;
+	background-color: transparent;
+	text-decoration: none;
+}
+
+em {
+	font-style: normal;
+	font-weight: 500;
+	color: #ffff0c;
+}
