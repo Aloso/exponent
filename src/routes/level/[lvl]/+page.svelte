@@ -16,6 +16,11 @@
 	let field = $state<Field>()
 	let levelResult: 'won' | 'lost' | undefined = $state()
 
+	$effect(() => {
+		level
+		levelResult = undefined
+	})
+
 	let levelIndex = $derived(levels.findIndex((l) => l.id === level.id))
 	let nextLevel = $derived(levels[levelIndex + 1])
 
@@ -85,14 +90,17 @@
 	h1 {
 		text-align: center;
 		line-height: 2.5rem;
+		user-select: none;
 	}
 
 	.emoji {
 		text-align: center;
 		font-size: 3rem;
+		user-select: none;
 	}
 
 	.description {
 		text-align: center;
+		user-select: none;
 	}
 </style>

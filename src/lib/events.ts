@@ -1,11 +1,6 @@
 import type { Pos } from './position'
 
-export const enum Direction {
-	Up,
-	Down,
-	Left,
-	Right,
-}
+export type Direction = 'up' | 'down' | 'left' | 'right'
 
 export interface MoveEvent {
 	oldPos: Pos

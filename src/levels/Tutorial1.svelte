@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Direction } from '$lib/events'
 	import { emptyPos, update, type LevelOverlayProps } from '$lib/levels'
 	import { onMount } from 'svelte'
 	import TutorialOverlay from '../components/TutorialOverlay.svelte'
@@ -12,8 +11,8 @@
 	onMount(() => {
 		const handler = field.on('move', (event) => {
 			if (
-				(step === 1 && event.direction === Direction.Right) ||
-				(step === 2 && event.direction === Direction.Down) ||
+				(step === 1 && event.direction === 'right') ||
+				(step === 2 && event.direction === 'down') ||
 				step === 3
 			) {
 				if (step === 1) {
@@ -56,10 +55,10 @@
 				)
 				break
 			case 3:
-				field.setGoal(16)
+				// field.setGoal(16)
 				break
 			case 4:
-				field.setGoal(undefined)
+				// field.setGoal(undefined)
 				break
 		}
 	})
@@ -94,8 +93,10 @@
 		</p>
 		<p>Swipe nun <em>nach unten</em>!</p>
 	{:else if step === 3}
-		<p>Wenn zwei gleiche Zahlen aufeinander treffen, werden sie <em>kombiniert</em>.</p>
-		<p>Versuche, eine möglichst <em>hohe Zahl</em> zu erreichen!</p>
+		<p>
+			Aufeinander treffende Zahlen werden <em>kombiniert</em>. Versuche, eine möglichst
+			<em>hohe Zahl</em> zu erreichen!
+		</p>
 		<p>Achtung: Wenn im Spielfeld kein Platz mehr ist, hast du verloren.</p>
 	{:else if step === 4}
 		<p>Du hast eine <em>16</em> erreicht!</p>

@@ -30,6 +30,7 @@
 		bottom: 0;
 		background: linear-gradient(to bottom, #0003, #0006);
 		backdrop-filter: blur(8px);
+		z-index: 100;
 	}
 
 	.overlay {
@@ -42,6 +43,7 @@
 		padding: 2rem;
 		font-size: 1.25rem;
 		line-height: 1.75rem;
+		z-index: 100;
 	}
 
 	.buttons {
@@ -54,6 +56,7 @@
 		bottom: 0;
 		padding: 2rem;
 		font-size: 1.25rem;
+		z-index: 100;
 
 		.button {
 			background-color: #fff1;

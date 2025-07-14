@@ -1,12 +1,9 @@
-import { Direction } from './events'
+import type { Direction } from './events'
+import { printSquare, type Square } from './square'
 
 export interface Pos {
 	squares: Square[][]
 	state: 'playing' | 'lost' | 'won'
-}
-
-export interface Square {
-	num?: number
 }
 
 type IterationCallback = (
@@ -17,12 +14,6 @@ type IterationCallback = (
 	incHead: () => void,
 	incTail: () => void,
 ) => void
-
-function printSquare(square: Square): string {
-	if (square.num === undefined) return '  -'
-	else if (square.num < 1000) return `${square.num}`.padStart(3)
-	else return (Math.round(square.num / 1000) + 'K').padStart(3)
-}
 
 export function printPos(pos: Pos): string {
 	return pos.squares.map((row) => row.map(printSquare).join(' ')).join('\n')
@@ -40,7 +31,7 @@ export function iterateField(
 		hy = 0
 
 	switch (direction) {
-		case Direction.Up: {
+		case 'up': {
 			const incHead = () => hy++
 			const incTail = () => ty++
 
@@ -50,7 +41,7 @@ export function iterateField(
 			}
 			break
 		}
-		case Direction.Down: {
+		case 'down': {
 			const incHead = () => hy--
 			const incTail = () => ty--
 
@@ -60,7 +51,7 @@ export function iterateField(
 			}
 			break
 		}
-		case Direction.Left: {
+		case 'left': {
 			const incHead = () => hx++
 			const incTail = () => tx++
 
@@ -70,7 +61,7 @@ export function iterateField(
 			}
 			break
 		}
-		case Direction.Right: {
+		case 'right': {
 			const incHead = () => hx--
 			const incTail = () => tx--
 

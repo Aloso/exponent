@@ -51,7 +51,8 @@
 		right: 0;
 		top: 0;
 		bottom: 0;
-		background: linear-gradient(to bottom, transparent, #0003);
+		background: linear-gradient(to bottom, transparent, transparent, #0003);
+		z-index: 100;
 
 		&.isInteractive {
 			pointer-events: none;
@@ -67,6 +68,15 @@
 		padding: 2rem;
 		font-size: 1.25rem;
 		line-height: 1.75rem;
+		z-index: 100;
+
+		:global(:first-child) {
+			margin-top: 0;
+		}
+
+		:global(:last-child) {
+			margin-bottom: 0;
+		}
 	}
 
 	.buttons {
@@ -76,7 +86,10 @@
 		bottom: 0;
 		padding: 2rem;
 		font-size: 1.25rem;
-		text-align: right;
+		display: flex;
+		gap: 1rem;
+		justify-content: flex-end;
+		z-index: 100;
 
 		.button {
 			background-color: #fff1;

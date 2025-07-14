@@ -1,18 +1,20 @@
 <script lang="ts">
-	import {
+	import type {
+		MoveEvent,
+		GameMoveHandler,
+		GameResultHandler,
+		GameHistoryHandler,
+		FieldEventHandler,
+		GameEvent,
+		ResultEvent,
+		HistoryEvent,
 		Direction,
-		type MoveEvent,
-		type GameMoveHandler,
-		type GameResultHandler,
-		type GameHistoryHandler,
-		type FieldEventHandler,
-		type GameEvent,
-		type ResultEvent,
-		type HistoryEvent,
 	} from '$lib/events'
 	import type { Level } from '$lib/levels'
-	import { iterateField, type Pos, type Square } from '$lib/position'
+	import { printPos, type Pos } from '$lib/position'
 	import { onMount } from 'svelte'
+	import SquareComponent from './Square.svelte'
+	import { finishMoveAndAddNumber, gameLogic } from '$lib/gameLogic'
 
 	interface Props {
 		level: Level
@@ -30,6 +32,10 @@
 		goal = level.goal
 	})
 
+	$effect(() => {
+		console.log(printPos(pos))
+	})
+
 	const handlers = {
 		move: [] as GameMoveHandler[],
 		win: [] as GameResultHandler[],
@@ -37,30 +43,42 @@
 		undo: [] as GameHistoryHandler[],
 	}
 
-	function move(direction: Direction) {
+	export function move(direction: Direction) {
 		triggerMove({ direction, oldPos: pos, newPos: calculateNext(pos, direction) })
 	}
 
 	function triggerMove(event: MoveEvent) {
-		const actualEvent = triggerEvent('move', event)
-		lastPos = pos
-		pos = actualEvent.newPos
-
-		if (pos.state !== 'playing' && lastPos.state === 'playing') {
-			const timestamp = Date.now()
-			const resultEvent =
-				pos.state === 'won'
-					? triggerEvent('win', { pos, timestamp })
-					: triggerEvent('lose', { pos, timestamp })
-			if (resultEvent) {
-				pos = resultEvent.pos
+		for (const row of pos.squares) {
+			for (const square of row) {
+				square.animation = undefined
 			}
 		}
+
+		const actualEvent = triggerEvent('move', event)
+		if (!actualEvent) return
+		lastPos = pos
+
+		// this makes sure that animations run, even if there
+		// was the same animation on the same square before
+		setTimeout(() => {
+			pos = actualEvent.newPos
+
+			if (pos.state !== 'playing' && lastPos.state === 'playing') {
+				const timestamp = Date.now()
+				const resultEvent =
+					pos.state === 'won'
+						? triggerEvent('win', { pos, timestamp })
+						: triggerEvent('lose', { pos, timestamp })
+				if (resultEvent) {
+					pos = resultEvent.pos
+				}
+			}
+		})
 	}
 
-	function triggerEvent(eventName: 'move', event: MoveEvent): MoveEvent
-	function triggerEvent(eventName: 'win' | 'lose', event: ResultEvent): ResultEvent
-	function triggerEvent(eventName: 'undo', event: HistoryEvent): HistoryEvent
+	function triggerEvent(eventName: 'move', event: MoveEvent): MoveEvent | undefined
+	function triggerEvent(eventName: 'win' | 'lose', event: ResultEvent): ResultEvent | undefined
+	function triggerEvent(eventName: 'undo', event: HistoryEvent): HistoryEvent | undefined
 	function triggerEvent(eventName: 'move' | 'win' | 'lose' | 'undo', event: GameEvent) {
 		let actualEvent = event
 		for (const handler of handlers[eventName]) {
@@ -106,122 +124,101 @@
 	}
 
 	function calculateNext(pos: Pos, direction: Direction): Pos {
-		const newSquares = getNextSquares(pos.squares, direction)
+		const newSquares = gameLogic(pos.squares, direction)
 		if (newSquares === pos.squares) {
 			// no move was done
 			return pos
 		}
 
-		let highestNumber = 0
-		for (const row of newSquares) {
-			for (const square of row) {
-				highestNumber = Math.max(highestNumber, square.num ?? 0)
-			}
-		}
-		if (level.goal && highestNumber >= level.goal) {
-			return { squares: newSquares, state: 'won' }
-		}
-
-		const emptyFields = newSquares.flatMap((row) => row.filter((s) => s.num === undefined))
-		if (emptyFields.length > 0) {
-			const idx = (Math.random() * emptyFields.length) | 0
-			emptyFields[idx].num = 2
-
-			if (emptyFields.length === 1) {
-				// field is full after this move
-				let moveIsPossible = false
-				for (const direction of [Direction.Up, Direction.Down, Direction.Left, Direction.Right]) {
-					if (getNextSquares(newSquares, direction) !== newSquares) {
-						// move succeeded
-						moveIsPossible = true
-						break
-					}
-				}
-				if (!moveIsPossible) {
-					return { squares: newSquares, state: 'lost' }
-				}
-			}
-		} else {
-			return { squares: newSquares, state: 'lost' }
-		}
-
-		return { squares: newSquares, state: pos.state }
-	}
-
-	function getNextSquares(squares: Square[][], direction: Direction) {
-		const newSquares = squares.map((row) => row.map((s) => ({ ...s })))
-		let moves = 0
-
-		iterateField(
-			newSquares[0].length,
-			newSquares.length,
-			direction,
-			(tx, ty, hx, hy, incHead, incTail) => {
-				const head = newSquares[hy][hx]
-				const tail = newSquares[ty][tx]
-
-				if (head !== tail && head.num !== undefined) {
-					if (head.num === tail.num) {
-						// merge
-						tail.num *= 2
-						head.num = undefined
-						moves++
-						incHead()
-						incTail()
-					} else if (tail.num === undefined) {
-						// move
-						tail.num = head.num
-						head.num = undefined
-						moves++
-						incHead()
-					} else {
-						incTail()
-					}
-				} else {
-					incHead()
-				}
-			},
-		)
-
-		if (moves === 0) {
-			return squares
-		}
-		return newSquares
+		const state = finishMoveAndAddNumber(newSquares, goal)
+		console.log(state)
+		return { squares: newSquares, state }
 	}
 
 	onMount(() => {
-		const keyDownHandler = (event: KeyboardEvent) => {
-			if (event.key === 'ArrowLeft') move(Direction.Left)
-			else if (event.key === 'ArrowRight') move(Direction.Right)
-			else if (event.key === 'ArrowUp') move(Direction.Up)
-			else if (event.key === 'ArrowDown') move(Direction.Down)
+		function isInteractive(target: HTMLElement): boolean {
+			return (
+				target.hasAttribute('data-interactive') ||
+				(target.parentElement !== null &&
+					target.parentElement !== document.body &&
+					isInteractive(target.parentElement))
+			)
 		}
+
+		const keyDownHandler = (event: KeyboardEvent) => {
+			if (event.key === 'ArrowLeft') move('left')
+			else if (event.key === 'ArrowRight') move('right')
+			else if (event.key === 'ArrowUp') move('up')
+			else if (event.key === 'ArrowDown') move('down')
+		}
+
+		let gestureStart: { x: number; y: number } | undefined
+
+		const pointerDownHandler = (event: PointerEvent) => {
+			let target = event.currentTarget
+			if (target instanceof HTMLElement && isInteractive(target)) return
+
+			gestureStart = { x: event.clientX, y: event.clientY }
+			event.preventDefault()
+			event.stopImmediatePropagation()
+		}
+		const pointerMoveHandler = (event: PointerEvent) => {
+			if (gestureStart) {
+				event.preventDefault()
+				event.stopImmediatePropagation()
+
+				const dx = event.clientX - gestureStart.x
+				const dy = event.clientY - gestureStart.y
+				const distance = Math.sqrt(dx * dx + dy * dy)
+				const required = 20 + Math.min(window.innerWidth, window.innerHeight) / 15
+				if (distance > required) {
+					gestureStart = undefined
+
+					let angle = Math.atan2(dy, dx)
+					if (angle < 0) {
+						angle += Math.PI * 2
+					}
+					const section = Math.PI / 4
+					if (angle < section || angle > section * 7) {
+						move('right')
+					} else if (angle < section * 3) {
+						move('down')
+					} else if (angle < section * 5) {
+						move('left')
+					} else {
+						move('up')
+					}
+				}
+			}
+		}
+		const pointerCancelHandler = () => {
+			gestureStart = undefined
+		}
+
 		window.addEventListener('keydown', keyDownHandler)
+		window.addEventListener('pointerdown', pointerDownHandler, { passive: false })
+		window.addEventListener('pointermove', pointerMoveHandler, { passive: false })
+		window.addEventListener('pointerup', pointerCancelHandler)
+		window.addEventListener('pointercancel', pointerCancelHandler)
+		window.addEventListener('pointerleave', pointerCancelHandler)
 
 		return () => {
 			window.removeEventListener('keydown', keyDownHandler)
+			window.removeEventListener('pointerdown', pointerDownHandler)
+			window.removeEventListener('pointermove', pointerMoveHandler)
+			window.removeEventListener('pointerup', pointerCancelHandler)
+			window.removeEventListener('pointercancel', pointerCancelHandler)
+			window.removeEventListener('pointerleave', pointerCancelHandler)
 		}
 	})
 </script>
-
-<div style="text-align: center; margin-bottom: 0.5rem">
-	<button onclick={() => move(Direction.Up)}>Up</button>
-	<button onclick={() => move(Direction.Down)}>Down</button>
-	<button onclick={() => move(Direction.Left)}>Left</button>
-	<button onclick={() => move(Direction.Right)}>Right</button>
-</div>
 
 <div class="field">
 	<div class="outer">
 		<div class="inner">
 			{#each pos.squares as row}
 				{#each row as square}
-					<div
-						class="square d{String(square.num ?? '').length}"
-						class:full={square.num !== undefined}
-					>
-						{square.num ?? ''}
-					</div>
+					<SquareComponent {square} />
 				{/each}
 			{/each}
 		</div>
@@ -245,7 +242,7 @@
 	.outer {
 		position: absolute;
 		box-sizing: border-box;
-		background-color: #00000017;
+		background-color: #6c016c;
 		border-radius: 1rem;
 		width: 100%;
 		height: 100%;
@@ -258,48 +255,11 @@
 		height: 100%;
 		grid-template-columns: 1fr 1fr 1fr 1fr;
 		grid-template-rows: 1fr 1fr 1fr 1fr;
-		gap: 1rem;
+		gap: 4%;
 	}
 
 	.goal {
 		margin: 2rem 0 1rem 0;
 		text-align: center;
-	}
-
-	.square {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		border-radius: 0.3rem;
-		background-color: #0001;
-
-		&.full {
-			background-color: #fff2;
-		}
-
-		&.d1 {
-			font-size: 7.5vw;
-		}
-		&.d2 {
-			font-size: 6.5vw;
-		}
-		&.d3 {
-			font-size: 5.5vw;
-		}
-		&.d4 {
-			font-size: 5vw;
-		}
-		&.d5 {
-			font-size: 4.5vw;
-		}
-		&.d6 {
-			font-size: 4vw;
-		}
-		&.d7 {
-			font-size: 3.75vw;
-		}
-		&.d8 {
-			font-size: 3.5vw;
-		}
 	}
 </style>
