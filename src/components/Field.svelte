@@ -162,6 +162,12 @@
 			event.preventDefault()
 			event.stopImmediatePropagation()
 		}
+		const touchMoveHandler = (event: TouchEvent) => {
+			if (gestureStart) {
+				event.preventDefault()
+				event.stopImmediatePropagation()
+			}
+		}
 		const pointerMoveHandler = (event: PointerEvent) => {
 			if (gestureStart) {
 				event.preventDefault()
@@ -198,6 +204,7 @@
 		window.addEventListener('keydown', keyDownHandler)
 		window.addEventListener('pointerdown', pointerDownHandler, { passive: false })
 		window.addEventListener('pointermove', pointerMoveHandler, { passive: false })
+		window.addEventListener('touchmove', touchMoveHandler, { passive: false })
 		window.addEventListener('pointerup', pointerCancelHandler)
 		window.addEventListener('pointercancel', pointerCancelHandler)
 		window.addEventListener('pointerleave', pointerCancelHandler)
@@ -206,6 +213,7 @@
 			window.removeEventListener('keydown', keyDownHandler)
 			window.removeEventListener('pointerdown', pointerDownHandler)
 			window.removeEventListener('pointermove', pointerMoveHandler)
+			window.removeEventListener('touchmove', touchMoveHandler)
 			window.removeEventListener('pointerup', pointerCancelHandler)
 			window.removeEventListener('pointercancel', pointerCancelHandler)
 			window.removeEventListener('pointerleave', pointerCancelHandler)
