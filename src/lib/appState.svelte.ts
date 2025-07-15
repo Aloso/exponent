@@ -1,5 +1,6 @@
 export interface Config {
 	completedLevels: CompletedLevel[]
+	initialized: boolean
 }
 
 export interface CompletedLevel {
@@ -9,6 +10,7 @@ export interface CompletedLevel {
 
 const initialConfig: Config = {
 	completedLevels: [],
+	initialized: false,
 }
 
 export const appState = $state(initialConfig)
@@ -19,6 +21,7 @@ export function loadConfig() {
 		const newState = JSON.parse(stored) as Config
 		appState.completedLevels = newState.completedLevels
 	}
+	appState.initialized = true
 }
 
 export function saveConfig() {

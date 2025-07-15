@@ -18,7 +18,9 @@
 				if (step === 1) {
 					event.newPos = update(emptyPos, (pos) => {
 						pos.squares[2][3].num = 2
+						pos.squares[2][3].animation = { kind: 'move', x: -1, y: 0 }
 						pos.squares[0][3].num = 2
+						pos.squares[0][3].animation = { kind: 'appear' }
 					})
 					setTimeout(() => step++, 500)
 				} else if (step === 2) {
@@ -94,8 +96,8 @@
 		<p>Swipe nun <em>nach unten</em>!</p>
 	{:else if step === 3}
 		<p>
-			Aufeinander treffende Zahlen werden <em>kombiniert</em>. Versuche, eine möglichst
-			<em>hohe Zahl</em> zu erreichen!
+			Aufeinander treffende Zahlen werden <em>kombiniert</em>. Versuche, eine
+			<em>16</em> zu erreichen!
 		</p>
 		<p>Achtung: Wenn im Spielfeld kein Platz mehr ist, hast du verloren.</p>
 	{:else if step === 4}

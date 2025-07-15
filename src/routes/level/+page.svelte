@@ -3,7 +3,7 @@
 	import { getNextLevel, levels } from '$lib/levels'
 	import LevelButton from '../../components/LevelButton.svelte'
 
-	let nextLevel = getNextLevel()
+	let nextLevel = $derived(getNextLevel())
 
 	$effect(() => {
 		if (nextLevel) {

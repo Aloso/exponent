@@ -93,11 +93,13 @@
 	export function on(eventName: 'win' | 'lose', handler: GameResultHandler): GameResultHandler
 	export function on(eventName: 'undo', handler: GameHistoryHandler): GameHistoryHandler
 	export function on(eventName: 'move' | 'win' | 'lose' | 'undo', handler: FieldEventHandler) {
+		console.log('registered event handler:', eventName)
 		handlers[eventName].push(handler as any)
 		return handler
 	}
 
 	export function off(eventName: 'move' | 'win' | 'lose' | 'undo', handler: FieldEventHandler) {
+		console.log('removed event handler:', eventName)
 		handlers[eventName] = handlers[eventName].filter((h) => h !== handler) as any
 	}
 
@@ -154,11 +156,11 @@
 
 		let gestureStart: { x: number; y: number } | undefined
 
-		const pointerDownHandler = (event: PointerEvent) => {
+		const touchStartHandler = (event: TouchEvent) => {
 			let target = event.currentTarget
 			if (target instanceof HTMLElement && isInteractive(target)) return
 
-			gestureStart = { x: event.clientX, y: event.clientY }
+			gestureStart = { x: event.touches[0].clientX, y: event.touches[0].clientY }
 			event.preventDefault()
 			event.stopImmediatePropagation()
 		}
@@ -166,15 +168,9 @@
 			if (gestureStart) {
 				event.preventDefault()
 				event.stopImmediatePropagation()
-			}
-		}
-		const pointerMoveHandler = (event: PointerEvent) => {
-			if (gestureStart) {
-				event.preventDefault()
-				event.stopImmediatePropagation()
 
-				const dx = event.clientX - gestureStart.x
-				const dy = event.clientY - gestureStart.y
+				const dx = event.touches[0].clientX - gestureStart.x
+				const dy = event.touches[0].clientY - gestureStart.y
 				const distance = Math.sqrt(dx * dx + dy * dy)
 				const required = 20 + Math.min(window.innerWidth, window.innerHeight) / 15
 				if (distance > required) {
@@ -197,26 +193,23 @@
 				}
 			}
 		}
-		const pointerCancelHandler = () => {
+
+		const touchCancelHandler = () => {
 			gestureStart = undefined
 		}
 
 		window.addEventListener('keydown', keyDownHandler)
-		window.addEventListener('pointerdown', pointerDownHandler, { passive: false })
-		window.addEventListener('pointermove', pointerMoveHandler, { passive: false })
+		window.addEventListener('touchstart', touchStartHandler, { passive: false })
 		window.addEventListener('touchmove', touchMoveHandler, { passive: false })
-		window.addEventListener('pointerup', pointerCancelHandler)
-		window.addEventListener('pointercancel', pointerCancelHandler)
-		window.addEventListener('pointerleave', pointerCancelHandler)
+		window.addEventListener('touchend', touchCancelHandler)
+		window.addEventListener('touchcancel', touchCancelHandler)
 
 		return () => {
 			window.removeEventListener('keydown', keyDownHandler)
-			window.removeEventListener('pointerdown', pointerDownHandler)
-			window.removeEventListener('pointermove', pointerMoveHandler)
+			window.removeEventListener('touchstart', touchStartHandler)
 			window.removeEventListener('touchmove', touchMoveHandler)
-			window.removeEventListener('pointerup', pointerCancelHandler)
-			window.removeEventListener('pointercancel', pointerCancelHandler)
-			window.removeEventListener('pointerleave', pointerCancelHandler)
+			window.removeEventListener('touchend', touchCancelHandler)
+			window.removeEventListener('touchcancel', touchCancelHandler)
 		}
 	})
 </script>

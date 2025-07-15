@@ -41,20 +41,18 @@
 	}
 
 	onMount(() => {
-		if (level.goal && !level.overlay) {
-			const winHandler = field!.on('win', (event) => {
-				levelResult = 'won'
-				return event
-			})
-			const loseHandler = field!.on('lose', (event) => {
-				levelResult = 'lost'
-				return event
-			})
+		const winHandler = field!.on('win', (event) => {
+			if (!level.overlay) levelResult = 'won'
+			return event
+		})
+		const loseHandler = field!.on('lose', (event) => {
+			if (!level.overlay) levelResult = 'lost'
+			return event
+		})
 
-			return () => {
-				field!.off('win', winHandler)
-				field!.off('lose', loseHandler)
-			}
+		return () => {
+			field!.off('win', winHandler)
+			field!.off('lose', loseHandler)
 		}
 	})
 </script>

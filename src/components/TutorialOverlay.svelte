@@ -22,11 +22,11 @@
 	}: Props = $props()
 </script>
 
-<div class="backdrop" class:isInteractive></div>
+<div class="backdrop" class:isInteractive data-interactive={isInteractive}></div>
 
-<div class="overlay">{@render children()}</div>
+<div class="overlay" data-interactive>{@render children()}</div>
 
-<div class="buttons">
+<div class="buttons" data-interactive>
 	{#if step > 0}
 		<button class="button back" onclick={() => (step -= 1)}>Zurück</button>
 	{/if}

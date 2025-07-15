@@ -21,7 +21,7 @@ export interface Level {
 export const emptyPos: Pos = {
 	squares: [
 		[
-			{ variant: 'wall', id: 0 },
+			{ variant: 'normal', id: 0 },
 			{ variant: 'normal', id: 1 },
 			{ variant: 'normal', id: 2 },
 			{ variant: 'normal', id: 3 },
@@ -29,8 +29,8 @@ export const emptyPos: Pos = {
 		[
 			{ variant: 'normal', id: 4 },
 			{ variant: 'normal', id: 5 },
-			{ variant: 'wall', id: 6 },
-			{ variant: 'empty', id: 7 },
+			{ variant: 'normal', id: 6 },
+			{ variant: 'normal', id: 7 },
 		],
 		[
 			{ variant: 'normal', id: 8 },
@@ -82,9 +82,32 @@ export const levels: Level[] = [
 		}),
 		goal: 256,
 	},
+	{
+		id: 'walls-128',
+		name: '03: Blockaden',
+		pos: update(emptyPos, (pos) => {
+			pos.squares[0][0].variant = 'wall'
+			pos.squares[1][2].variant = 'wall'
+			pos.squares[2][2].num = 2
+		}),
+		goal: 128,
+	},
+	{
+		id: 'empty-256',
+		name: '04: Die Leere',
+		pos: update(emptyPos, (pos) => {
+			pos.squares[3][0].variant = 'empty'
+			pos.squares[3][3].variant = 'empty'
+			pos.squares[0][1].variant = 'empty'
+			pos.squares[2][2].num = 2
+		}),
+		goal: 256,
+	},
 ]
 
 export function getNextLevel() {
+	if (!appState.initialized) return
+
 	const completed = new Set(appState.completedLevels.map((l) => l.id))
 	return levels.find((l) => !completed.has(l.id))
 }
