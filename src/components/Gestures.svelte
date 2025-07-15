@@ -41,13 +41,11 @@
 		let gestureStart: { x: number; y: number } | undefined
 
 		const touchStartHandler = (event: TouchEvent) => {
-			console.log('touch start')
 			gestureStart = { x: event.touches[0].clientX, y: event.touches[0].clientY }
 			event.preventDefault()
 			event.stopImmediatePropagation()
 		}
 		const pointerDownHandler = (event: PointerEvent) => {
-			console.log('pointer down')
 			if (!gestureStart) {
 				gestureStart = { x: event.clientX, y: event.clientY }
 				event.preventDefault()

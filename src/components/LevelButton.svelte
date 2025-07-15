@@ -2,15 +2,16 @@
 	import type { Level } from '$lib/levels'
 
 	interface Props {
-		number: number
 		level: Level
 	}
 
-	let { number, level }: Props = $props()
+	let { level }: Props = $props()
 </script>
 
 <a class="button level" href="/level/{level.id}">
-	<div class="number">{number}</div>
+	{#if level.number !== undefined}
+		<div class="number">{level.number}</div>
+	{/if}
 	<div class="label">{level.name}</div>
 </a>
 

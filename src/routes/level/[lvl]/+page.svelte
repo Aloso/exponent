@@ -5,6 +5,7 @@
 	import { onMount } from 'svelte'
 	import Field from '../../../components/Field.svelte'
 	import GameResultOverlay from '../../../components/GameResultOverlay.svelte'
+	import LevelHeader from '../../../components/LevelHeader.svelte'
 
 	interface Props {
 		data: Level
@@ -57,7 +58,7 @@
 	})
 </script>
 
-<h1>{level.name}</h1>
+<LevelHeader {level} {undo} />
 
 <Field {level} bind:this={field} />
 
@@ -66,10 +67,13 @@
 {:else if levelResult}
 	{#if levelResult === 'won'}
 		<GameResultOverlay
-			actions={[{ label: nextLevel ? 'Nächster Level' : 'Weiter', action: finish }]}
+			actions={[{ label: nextLevel ? 'Nächster Level' : 'Zum Hauptmenü', action: finish }]}
 		>
-			<h1>Level abgeschlossen</h1>
+			<h1>Level {level.number ?? ''} abgeschlossen</h1>
 			<p class="emoji">🎉</p>
+			{#if !nextLevel}
+				<p class="description">Du hast <em>alle Level</em> abgeschlossen!</p>
+			{/if}
 		</GameResultOverlay>
 	{:else}
 		<GameResultOverlay
@@ -85,12 +89,6 @@
 {/if}
 
 <style lang="scss">
-	h1 {
-		text-align: center;
-		line-height: 2.5rem;
-		user-select: none;
-	}
-
 	.emoji {
 		text-align: center;
 		font-size: 3rem;

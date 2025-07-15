@@ -92,17 +92,20 @@
 		z-index: 100;
 
 		.button {
-			background-color: #fff1;
+			background-color: #fff2;
 			padding-block: 0.5rem;
-			@include helper.focus-background(#fff2);
+			font-weight: 500;
+			@include helper.focus-background(#fff3);
 
 			&[disabled] {
 				opacity: 0.6;
+				font-weight: 400;
 			}
 		}
 
 		.back {
 			opacity: 0.6;
+			font-weight: 400;
 		}
 	}
 </style>

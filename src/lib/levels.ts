@@ -12,6 +12,7 @@ export interface LevelOverlayProps {
 
 export interface Level {
 	id: string
+	number?: number
 	name: string
 	pos: Pos
 	overlay?: Component<LevelOverlayProps>
@@ -68,7 +69,8 @@ export const levels: Level[] = [
 	},
 	{
 		id: 'classic-128',
-		name: '01: Classic',
+		number: 1,
+		name: 'Classic',
 		pos: update(emptyPos, (pos) => {
 			pos.squares[2][2].num = 2
 		}),
@@ -76,7 +78,8 @@ export const levels: Level[] = [
 	},
 	{
 		id: 'classic-256',
-		name: '02: Classic',
+		number: 2,
+		name: 'Classic',
 		pos: update(emptyPos, (pos) => {
 			pos.squares[2][2].num = 2
 		}),
@@ -84,7 +87,8 @@ export const levels: Level[] = [
 	},
 	{
 		id: 'walls-128',
-		name: '03: Blockaden',
+		number: 3,
+		name: 'Blockaden',
 		pos: update(emptyPos, (pos) => {
 			pos.squares[0][0].variant = 'wall'
 			pos.squares[1][2].variant = 'wall'
@@ -94,7 +98,8 @@ export const levels: Level[] = [
 	},
 	{
 		id: 'empty-256',
-		name: '04: Die Leere',
+		number: 4,
+		name: 'Die Leere',
 		pos: update(emptyPos, (pos) => {
 			pos.squares[3][0].variant = 'empty'
 			pos.squares[3][3].variant = 'empty'

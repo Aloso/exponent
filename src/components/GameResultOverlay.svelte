@@ -31,6 +31,7 @@
 		background: linear-gradient(to bottom, #0003, #0006);
 		backdrop-filter: blur(8px);
 		z-index: 100;
+		animation: appear-slowly 1s ease forwards;
 	}
 
 	.overlay {
@@ -44,6 +45,7 @@
 		font-size: 1.25rem;
 		line-height: 1.75rem;
 		z-index: 100;
+		animation: appear-slowly 1s ease forwards;
 	}
 
 	.buttons {
@@ -57,11 +59,24 @@
 		padding: 2rem;
 		font-size: 1.25rem;
 		z-index: 100;
+		animation: appear-slowly 1s ease forwards;
 
 		.button {
 			background-color: #fff1;
 			padding-block: 0.5rem;
 			@include helper.focus-background(#fff2);
+		}
+	}
+
+	@keyframes appear-slowly {
+		0% {
+			opacity: 0;
+		}
+		50% {
+			opacity: 0;
+		}
+		100% {
+			opacity: 1;
 		}
 	}
 </style>

@@ -25,6 +25,7 @@
 
 	let pos = $state(level.pos)
 	let lastPos = $state(level.pos)
+	let lastMoveTime = 0
 	let goal = $state(level.goal)
 
 	$effect(() => {
@@ -49,6 +50,12 @@
 	}
 
 	function triggerMove(event: MoveEvent) {
+		let moveTime = Date.now()
+		if (moveTime - lastMoveTime < 200) {
+			return
+		}
+		lastMoveTime = moveTime
+
 		for (const row of pos.squares) {
 			for (const square of row) {
 				square.animation = undefined
@@ -62,18 +69,20 @@
 		// this makes sure that animations run, even if there
 		// was the same animation on the same square before
 		setTimeout(() => {
-			pos = actualEvent.newPos
+			requestAnimationFrame(() => {
+				pos = actualEvent.newPos
 
-			if (pos.state !== 'playing' && lastPos.state === 'playing') {
-				const timestamp = Date.now()
-				const resultEvent =
-					pos.state === 'won'
-						? triggerEvent('win', { pos, timestamp })
-						: triggerEvent('lose', { pos, timestamp })
-				if (resultEvent) {
-					pos = resultEvent.pos
+				if (pos.state !== 'playing' && lastPos.state === 'playing') {
+					const timestamp = Date.now()
+					const resultEvent =
+						pos.state === 'won'
+							? triggerEvent('win', { pos, timestamp })
+							: triggerEvent('lose', { pos, timestamp })
+					if (resultEvent) {
+						pos = resultEvent.pos
+					}
 				}
-			}
+			})
 		})
 	}
 
@@ -165,6 +174,18 @@
 		height: 0;
 		margin: 0 auto;
 		padding-bottom: 90%;
+		animation: appear-from-center 0.3s ease forwards;
+	}
+
+	@keyframes appear-from-center {
+		0% {
+			opacity: 0;
+			transform: scale(0.7);
+		}
+		100% {
+			opacity: 1;
+			transform: scale(1);
+		}
 	}
 
 	.outer {

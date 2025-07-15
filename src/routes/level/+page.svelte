@@ -13,8 +13,8 @@
 </script>
 
 <div class="levels">
-	{#each levels as level, number}
-		<LevelButton {level} {number} />
+	{#each levels as level}
+		<LevelButton {level} />
 	{/each}
 </div>
 
