@@ -15,6 +15,7 @@
 	import { onMount } from 'svelte'
 	import SquareComponent from './Square.svelte'
 	import { finishMoveAndAddNumber, gameLogic } from '$lib/gameLogic'
+	import Gestures from './Gestures.svelte'
 
 	interface Props {
 		level: Level
@@ -136,82 +137,6 @@
 		console.log(state)
 		return { squares: newSquares, state }
 	}
-
-	onMount(() => {
-		function isInteractive(target: HTMLElement): boolean {
-			return (
-				target.hasAttribute('data-interactive') ||
-				(target.parentElement !== null &&
-					target.parentElement !== document.body &&
-					isInteractive(target.parentElement))
-			)
-		}
-
-		const keyDownHandler = (event: KeyboardEvent) => {
-			if (event.key === 'ArrowLeft') move('left')
-			else if (event.key === 'ArrowRight') move('right')
-			else if (event.key === 'ArrowUp') move('up')
-			else if (event.key === 'ArrowDown') move('down')
-		}
-
-		let gestureStart: { x: number; y: number } | undefined
-
-		const touchStartHandler = (event: TouchEvent) => {
-			let target = event.currentTarget
-			if (target instanceof HTMLElement && isInteractive(target)) return
-
-			gestureStart = { x: event.touches[0].clientX, y: event.touches[0].clientY }
-			event.preventDefault()
-			event.stopImmediatePropagation()
-		}
-		const touchMoveHandler = (event: TouchEvent) => {
-			if (gestureStart) {
-				event.preventDefault()
-				event.stopImmediatePropagation()
-
-				const dx = event.touches[0].clientX - gestureStart.x
-				const dy = event.touches[0].clientY - gestureStart.y
-				const distance = Math.sqrt(dx * dx + dy * dy)
-				const required = 20 + Math.min(window.innerWidth, window.innerHeight) / 15
-				if (distance > required) {
-					gestureStart = undefined
-
-					let angle = Math.atan2(dy, dx)
-					if (angle < 0) {
-						angle += Math.PI * 2
-					}
-					const section = Math.PI / 4
-					if (angle < section || angle > section * 7) {
-						move('right')
-					} else if (angle < section * 3) {
-						move('down')
-					} else if (angle < section * 5) {
-						move('left')
-					} else {
-						move('up')
-					}
-				}
-			}
-		}
-
-		const touchCancelHandler = () => {
-			gestureStart = undefined
-		}
-
-		window.addEventListener('keydown', keyDownHandler)
-		window.addEventListener('touchstart', touchStartHandler, { passive: false })
-		window.addEventListener('touchmove', touchMoveHandler, { passive: false })
-		window.addEventListener('touchend', touchCancelHandler)
-		window.addEventListener('touchcancel', touchCancelHandler)
-
-		return () => {
-			window.removeEventListener('keydown', keyDownHandler)
-			window.removeEventListener('touchstart', touchStartHandler)
-			window.removeEventListener('touchmove', touchMoveHandler)
-			window.removeEventListener('touchend', touchCancelHandler)
-			window.removeEventListener('touchcancel', touchCancelHandler)
-		}
-	})
 </script>
 
 <div class="field">
@@ -229,6 +154,8 @@
 {#if goal}
 	<div class="goal">Erreiche die Zahl <em>{goal}</em>.</div>
 {/if}
+
+<Gestures onMove={move} />
 
 <style lang="scss">
 	.field {

@@ -9,11 +9,11 @@
 	let { children, actions }: Props = $props()
 </script>
 
-<div class="backdrop" data-interactive></div>
+<div class="backdrop"></div>
 
-<div class="overlay" data-interactive>{@render children()}</div>
+<div class="overlay">{@render children()}</div>
 
-<div class="buttons" data-interactive>
+<div class="buttons">
 	{#each actions as action}
 		<button class="button" onclick={action.action}>{action.label}</button>
 	{/each}
