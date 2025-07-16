@@ -44,8 +44,8 @@ export function gameLogic(squares: Square[][], direction: Direction) {
 					// move or vanish
 					if (tail.effects?.includes('black-hole')) {
 						const oldNum = head.num
-						tail.num = undefined
 						tail.animation = { kind: 'vanish', ...moveAnimation(hx - tx, hy - ty), oldNum }
+						incTail()
 					} else {
 						tail.num = head.num
 						tail.animation = { kind: 'move', ...moveAnimation(hx - tx, hy - ty) }

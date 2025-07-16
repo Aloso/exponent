@@ -62,7 +62,7 @@
 		class:wall={square.variant === 'wall'}
 		class:black-hole={!!square.effects?.includes('black-hole')}
 		data-num={square.num}
-		data-ani={oldSquares.length ? 'appear-merge' : square.animation?.kind}
+		data-ani={oldSquares.length === 2 ? 'appear-merge' : square.animation?.kind}
 		style={square.animation?.kind === 'move'
 			? `--ani-x: ${square.animation.x}; --ani-y: ${square.animation.y}`
 			: undefined}
