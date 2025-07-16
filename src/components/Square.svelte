@@ -11,18 +11,26 @@
 	interface OldSquare {
 		num: number
 		label: string
-		animation: SquareAnimation
+		animation: { kind: 'move' | 'move-vanish'; x: number; y: number }
 	}
 
-	let old = $derived.by(() => {
+	let oldSquares = $derived.by<OldSquare[]>(() => {
 		const ani = square.animation
-		if (ani?.kind !== 'merge') return
-		const num = ani.oldNum
-		const label = getLabel(num)
-		return [
-			{ num, label, animation: { kind: 'move', x: ani.x1, y: ani.y1 } },
-			{ num, label, animation: { kind: 'move', x: ani.x2, y: ani.y2 } },
-		] satisfies [OldSquare, OldSquare]
+		if (!ani) return []
+		if (ani.kind === 'merge') {
+			const num = ani.oldNum
+			const label = getLabel(num)
+			return [
+				{ num, label, animation: { kind: 'move', x: ani.x1, y: ani.y1 } },
+				{ num, label, animation: { kind: 'move', x: ani.x2, y: ani.y2 } },
+			]
+		} else if (ani.kind === 'vanish') {
+			const num = ani.oldNum
+			const label = getLabel(num)
+			return [{ num, label, animation: { kind: 'move-vanish', x: ani.x, y: ani.y } }]
+		} else {
+			return []
+		}
 	})
 
 	function getLabel(num: number | undefined) {
@@ -37,31 +45,24 @@
 </script>
 
 <div class="square-bg" class:empty={square.variant === 'empty'}>
-	{#if old}
+	{#each oldSquares as old}
 		<div
-			class="square d{old[0].label.length} full"
-			data-num={old[0].num}
-			data-ani="move"
-			style="--ani-x: {old[0].animation.x}; --ani-y: {old[0].animation.y}"
+			class="square d{old.label.length} full"
+			data-num={old.num}
+			data-ani={old.animation.kind}
+			style="--ani-x: {old.animation.x}; --ani-y: {old.animation.y}"
 		>
-			{old[0].label}
+			{old.label}
 		</div>
-		<div
-			class="square d{old[1].label.length} full"
-			data-num={old[1].num}
-			data-ani="move"
-			style="--ani-x: {old[1].animation.x}; --ani-y: {old[1].animation.y}"
-		>
-			{old[1].label}
-		</div>
-	{/if}
+	{/each}
 
 	<div
 		class="square d{label.length}"
 		class:full={square.num !== undefined}
 		class:wall={square.variant === 'wall'}
+		class:black-hole={!!square.effects?.includes('black-hole')}
 		data-num={square.num}
-		data-ani={old ? 'appear-merge' : square.animation?.kind}
+		data-ani={oldSquares.length ? 'appear-merge' : square.animation?.kind}
 		style={square.animation?.kind === 'move'
 			? `--ani-x: ${square.animation.x}; --ani-y: ${square.animation.y}`
 			: undefined}
@@ -136,8 +137,16 @@
 			background-image: url('/images/wall.svg');
 		}
 
+		&.black-hole {
+			background-color: black;
+		}
+
 		&[data-ani='move'] {
 			animation: move 0.2s ease forwards;
+		}
+		&[data-ani='move-vanish'] {
+			animation: move-vanish 0.4s ease forwards;
+			z-index: 2;
 		}
 		&[data-ani='appear'] {
 			animation: appear 0.5s ease-out forwards;
@@ -186,6 +195,24 @@
 			}
 			100% {
 				z-index: 0;
+			}
+		}
+
+		@keyframes move-vanish {
+			0% {
+				transform: translate(calc(var(--ani-x) * 100%), calc(var(--ani-y) * 100%)) scale(1);
+				opacity: 1;
+				z-index: 1;
+			}
+			50% {
+				transform: translate(0, 0) scale(1);
+				opacity: 1;
+				z-index: 1;
+			}
+			100% {
+				transform: translate(0, 0) scale(0);
+				opacity: 0;
+				z-index: 1;
 			}
 		}
 

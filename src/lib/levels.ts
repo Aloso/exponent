@@ -110,6 +110,16 @@ export const levels: Level[] = [
 		}),
 		goal: 256,
 	},
+	{
+		id: 'black-hole',
+		number: 5,
+		name: 'Schwarzes Loch',
+		pos: update(emptyPos, (pos) => {
+			pos.squares[2][1].effects = ['black-hole']
+			pos.squares[2][2].num = 2
+		}),
+		goal: 256,
+	},
 ]
 
 export function getNextLevel() {

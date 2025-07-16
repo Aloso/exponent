@@ -4,7 +4,7 @@ import type { Square } from './square'
 
 export function gameLogic(squares: Square[][], direction: Direction) {
 	const newSquares = squares.map((row) =>
-		row.map(({ id, variant, num }): Square => ({ id, variant, num })),
+		row.map(({ id, variant, effects, num }): Square => ({ id, variant, effects, num })),
 	)
 	let moves = 0
 
@@ -22,7 +22,7 @@ export function gameLogic(squares: Square[][], direction: Direction) {
 					incTail()
 				}
 			} else if (head.num !== undefined) {
-				if (head.num === tail.num) {
+				if (head.num === tail.num && !tail.effects?.includes('black-hole')) {
 					// merge
 					const oldNum = tail.num
 					tail.num *= 2
@@ -41,9 +41,15 @@ export function gameLogic(squares: Square[][], direction: Direction) {
 					incHead()
 					incTail()
 				} else if (tail.num === undefined && tail.variant === 'normal') {
-					// move
-					tail.num = head.num
-					tail.animation = { kind: 'move', ...moveAnimation(hx - tx, hy - ty) }
+					// move or vanish
+					if (tail.effects?.includes('black-hole')) {
+						const oldNum = head.num
+						tail.num = undefined
+						tail.animation = { kind: 'vanish', ...moveAnimation(hx - tx, hy - ty), oldNum }
+					} else {
+						tail.num = head.num
+						tail.animation = { kind: 'move', ...moveAnimation(hx - tx, hy - ty) }
+					}
 					head.num = undefined
 					moves++
 					incHead()
@@ -81,7 +87,9 @@ export function finishMoveAndAddNumber(
 	}
 
 	const availableFields = squares.flatMap((row) =>
-		row.filter((s) => s.num === undefined && s.variant === 'normal'),
+		row.filter(
+			(s) => s.num === undefined && s.variant === 'normal' && !s.effects?.includes('black-hole'),
+		),
 	)
 
 	if (availableFields.length > 0) {
