@@ -4,9 +4,10 @@
 	interface Props {
 		level: Level
 		undo: () => void
+		canUndo?: boolean
 	}
 
-	let { level, undo }: Props = $props()
+	let { level, undo, canUndo }: Props = $props()
 </script>
 
 <div class="header">
@@ -24,9 +25,14 @@
 		</svg>
 	</a>
 
-	<h1>{level.name}</h1>
+	<h1>
+		{#if level.number !== undefined}
+			<span class="lvl-number">{level.number}</span>
+		{/if}
+		{level.name}
+	</h1>
 
-	<button class="undo-button" aria-label="Rückgängig" onclick={undo}>
+	<button class="undo-button" aria-label="Rückgängig" onclick={undo} disabled={!canUndo}>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			viewBox="0 0 16 16"
@@ -55,6 +61,11 @@
 		display: flex;
 		padding: 1rem;
 		border-radius: 2rem;
+		cursor: pointer;
+
+		&[disabled] {
+			opacity: 0.5;
+		}
 
 		svg {
 			width: 1.25rem;
@@ -69,5 +80,17 @@
 		user-select: none;
 		flex-grow: 1;
 		text-align: center;
+	}
+
+	.lvl-number {
+		display: inline-block;
+		vertical-align: 0.15em;
+		padding: 0 0.8rem;
+		margin: 0 0.3rem 0 0;
+		background-color: white;
+		color: #540354;
+		border-radius: 2rem;
+		font-size: 70%;
+		line-height: 1.4em;
 	}
 </style>

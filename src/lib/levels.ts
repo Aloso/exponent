@@ -47,12 +47,14 @@ export const emptyPos: Pos = {
 		],
 	],
 	state: 'playing',
+	moveCount: 0,
 }
 
 export function update(pos: Pos, callback: (newPos: Pos) => void): Pos {
 	const updated: Pos = {
 		squares: pos.squares.map((row) => row.map((sq) => ({ ...sq }))),
 		state: pos.state,
+		moveCount: pos.moveCount,
 	}
 	callback(updated)
 	return updated

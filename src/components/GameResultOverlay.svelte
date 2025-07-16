@@ -43,7 +43,8 @@
 		height: auto;
 		padding: 2rem;
 		font-size: 1.25rem;
-		line-height: 1.75rem;
+		line-height: 1.8em;
+		text-align: center;
 		z-index: 100;
 		animation: appear-slowly 1s ease forwards;
 	}

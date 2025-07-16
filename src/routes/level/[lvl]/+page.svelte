@@ -58,7 +58,7 @@
 	})
 </script>
 
-<LevelHeader {level} {undo} />
+<LevelHeader {level} {undo} canUndo={field?.canUndo()} />
 
 <Field {level} bind:this={field} />
 
@@ -91,8 +91,24 @@
 <style lang="scss">
 	.emoji {
 		text-align: center;
-		font-size: 3rem;
+		font-size: 4rem;
 		user-select: none;
+		animation: 1.4s ease-in-out emoji-warp forwards;
+	}
+
+	@keyframes emoji-warp {
+		0% {
+			opacity: 0;
+			transform: scale(0);
+		}
+		80% {
+			opacity: 1;
+			transform: scale(1.5);
+		}
+		100% {
+			opacity: 1;
+			transform: scale(1);
+		}
 	}
 
 	.description {

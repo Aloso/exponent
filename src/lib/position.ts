@@ -4,6 +4,7 @@ import { printSquare, type Square } from './square'
 export interface Pos {
 	squares: Square[][]
 	state: 'playing' | 'lost' | 'won'
+	moveCount: number
 }
 
 type IterationCallback = (

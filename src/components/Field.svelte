@@ -12,7 +12,6 @@
 	} from '$lib/events'
 	import type { Level } from '$lib/levels'
 	import { printPos, type Pos } from '$lib/position'
-	import { onMount } from 'svelte'
 	import SquareComponent from './Square.svelte'
 	import { finishMoveAndAddNumber, gameLogic } from '$lib/gameLogic'
 	import Gestures from './Gestures.svelte'
@@ -64,12 +63,12 @@
 
 		const actualEvent = triggerEvent('move', event)
 		if (!actualEvent) return
-		lastPos = pos
 
 		// this makes sure that animations run, even if there
 		// was the same animation on the same square before
 		setTimeout(() => {
 			requestAnimationFrame(() => {
+				lastPos = pos
 				pos = actualEvent.newPos
 
 				if (pos.state !== 'playing' && lastPos.state === 'playing') {
@@ -113,16 +112,23 @@
 		handlers[eventName] = handlers[eventName].filter((h) => h !== handler) as any
 	}
 
-	export function setPos(newPos: Pos) {
+	export function setPos(newPos: Pos, allowUndo = false) {
 		pos = newPos
+		if (!allowUndo) {
+			lastPos = pos
+		}
 	}
 
 	export function setGoal(newGoal: number | undefined) {
 		goal = newGoal
 	}
 
+	export function canUndo() {
+		return pos !== lastPos && pos.moveCount > 0
+	}
+
 	export function undo() {
-		if (pos === lastPos) {
+		if (!canUndo()) {
 			return
 		}
 		const actualEvent = triggerEvent('undo', {
@@ -143,8 +149,7 @@
 		}
 
 		const state = finishMoveAndAddNumber(newSquares, goal)
-		console.log(state)
-		return { squares: newSquares, state }
+		return { squares: newSquares, state, moveCount: pos.moveCount + 1 }
 	}
 </script>
 
