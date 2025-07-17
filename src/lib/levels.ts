@@ -16,7 +16,7 @@ export interface Level {
 	name: string
 	pos: Pos
 	overlay?: Component<LevelOverlayProps>
-	goal?: number
+	goal?: number | { fields: number }
 }
 
 export const emptyPos: Pos = {
@@ -169,6 +169,37 @@ export const levels: Level[] = [
 			pos.squares[4][0].num = 2
 		}),
 		goal: 256,
+	},
+	{
+		id: 'target-areas',
+		number: 7,
+		name: 'Zielfelder',
+		pos: update(emptyPos4x5, (pos) => {
+			pos.squares[0][0].variant = 'empty'
+			pos.squares[0][1].variant = 'empty'
+			pos.squares[4][2].variant = 'empty'
+			pos.squares[4][3].variant = 'empty'
+
+			pos.squares[0][2].goal = 64
+			pos.squares[4][1].goal = 64
+			pos.squares[3][2].num = 2
+		}),
+		goal: { fields: 2 },
+	},
+	{
+		id: 'remote-target',
+		number: 8,
+		name: 'Entlegener Ort',
+		pos: update(emptyPos4x5, (pos) => {
+			pos.squares[1][0].variant = 'empty'
+			pos.squares[1][1].variant = 'wall'
+			pos.squares[3][2].variant = 'wall'
+			pos.squares[3][3].variant = 'empty'
+			pos.squares[4][3].goal = 256
+
+			pos.squares[2][2].num = 2
+		}),
+		goal: { fields: 1 },
 	},
 ]
 

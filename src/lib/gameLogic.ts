@@ -4,7 +4,7 @@ import type { Square } from './square'
 
 export function gameLogic(squares: Square[][], direction: Direction) {
 	const newSquares = squares.map((row) =>
-		row.map(({ id, variant, effects, num }): Square => ({ id, variant, effects, num })),
+		row.map(({ id, variant, effects, num, goal }): Square => ({ id, variant, effects, num, goal })),
 	)
 	let moves = 0
 
@@ -74,7 +74,7 @@ export function gameLogic(squares: Square[][], direction: Direction) {
 
 export function finishMoveAndAddNumber(
 	squares: Square[][],
-	goal?: number,
+	goal?: number | { fields: number },
 ): 'playing' | 'won' | 'lost' {
 	let highestNumber = 0
 	for (const row of squares) {
@@ -82,7 +82,9 @@ export function finishMoveAndAddNumber(
 			highestNumber = Math.max(highestNumber, square.num ?? 0)
 		}
 	}
-	if (goal && highestNumber >= goal) {
+	if (typeof goal === 'number' && highestNumber >= goal) {
+		return 'won'
+	} else if (squares.every((row) => row.every(squareIsWon))) {
 		return 'won'
 	}
 
@@ -123,4 +125,8 @@ function moveAnimation(x: number, y: number) {
 		x: x === 0 ? 0 : x + (Math.abs(x) - 1) * 0.2 * Math.sign(x),
 		y: y === 0 ? 0 : y + (Math.abs(y) - 1) * 0.2 * Math.sign(y),
 	}
+}
+
+function squareIsWon(square: Square) {
+	return !square.goal || (square.num && square.num >= square.goal)
 }

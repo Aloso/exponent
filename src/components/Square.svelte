@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Square, SquareAnimation } from '$lib/square'
+	import type { Square } from '$lib/square'
 
 	interface Props {
 		square: Square
@@ -45,6 +45,10 @@
 </script>
 
 <div class="square-bg" class:empty={square.variant === 'empty'}>
+	{#if square.goal}
+		<div class="goal">{square.goal}</div>
+	{/if}
+
 	{#each oldSquares as old}
 		<div
 			class="square d{old.label.length} full"
@@ -84,6 +88,21 @@
 			background-color: transparent;
 			box-shadow: none;
 		}
+	}
+
+	.goal {
+		box-sizing: border-box;
+		position: absolute;
+		width: 80%;
+		height: 80%;
+		margin: 10%;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		font-weight: 600;
+		color: #fffa;
+		border: 0.2rem solid #fff7;
 	}
 
 	.square {

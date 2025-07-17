@@ -119,7 +119,7 @@
 		}
 	}
 
-	export function setGoal(newGoal: number | undefined) {
+	export function setGoal(newGoal?: number | { fields: number }) {
 		goal = newGoal
 	}
 
@@ -165,8 +165,14 @@
 	</div>
 </div>
 
-{#if goal}
+{#if typeof goal === 'number'}
 	<div class="goal">Erreiche die Zahl <em>{goal}</em>.</div>
+{:else if goal}
+	{#if goal.fields > 1}
+		<div class="goal">Fülle die <em>Zielfelder</em> mit der erwarteten Zahl.</div>
+	{:else}
+		<div class="goal">Fülle das <em>Zielfeld</em> mit der erwarteten Zahl.</div>
+	{/if}
 {/if}
 
 <Gestures onMove={move} />

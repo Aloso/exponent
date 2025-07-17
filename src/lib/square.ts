@@ -4,6 +4,7 @@ export interface Square {
 	id: number
 	num?: number
 	animation?: SquareAnimation
+	goal?: number
 }
 
 export type SquareAnimation =
