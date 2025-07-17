@@ -1,20 +1,20 @@
 <script lang="ts">
-	import { goto } from '$app/navigation'
 	import { getNextLevel, levels } from '$lib/levels'
 	import LevelButton from '../../components/LevelButton.svelte'
 
 	let nextLevel = $derived(getNextLevel())
-
-	$effect(() => {
-		if (nextLevel) {
-			goto(`/level/${nextLevel.id}`, { replaceState: true })
-		}
-	})
+	let nextLevelIndex = $derived(
+		nextLevel ? levels.findIndex((lvl) => lvl.id === nextLevel.id) : undefined,
+	)
 </script>
 
 <div class="levels">
-	{#each levels as level}
-		<LevelButton {level} />
+	{#each levels as level, i}
+		<LevelButton
+			{level}
+			active={level.id === nextLevel?.id}
+			disabled={nextLevelIndex !== undefined && nextLevelIndex >= 0 && i > nextLevelIndex}
+		/>
 	{/each}
 </div>
 

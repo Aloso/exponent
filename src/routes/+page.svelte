@@ -3,13 +3,12 @@
 	import { useSpaInstallation } from '$lib/useSpaInstallation.svelte'
 
 	let installation = useSpaInstallation()
-	let nextLevel = $derived(getNextLevel())
 </script>
 
 <div class="content">
 	<h1>Exponent</h1>
 	<p>Ein Spiel von Lu</p>
-	<a class="button start-button" href={nextLevel ? `/level/${nextLevel.id}` : '/level'}>Start</a>
+	<a class="button start-button" href="/level">Start</a>
 	<button
 		class="install-button"
 		class:hidden={installation.installed}

@@ -46,7 +46,7 @@
 
 <div class="square-bg" class:empty={square.variant === 'empty'}>
 	{#if square.goal}
-		<div class="goal">{square.goal}</div>
+		<div class="goal">{square.goal}+</div>
 	{/if}
 
 	{#each oldSquares as old}

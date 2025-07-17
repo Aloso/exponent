@@ -84,7 +84,7 @@ export function finishMoveAndAddNumber(
 	}
 	if (typeof goal === 'number' && highestNumber >= goal) {
 		return 'won'
-	} else if (squares.every((row) => row.every(squareIsWon))) {
+	} else if (typeof goal === 'object' && squares.every((row) => row.every(squareIsWon))) {
 		return 'won'
 	}
 

@@ -24,7 +24,7 @@
 
 <div class="backdrop" class:isInteractive></div>
 
-<div class="overlay">{@render children()}</div>
+<div class="overlay" class:isInteractive>{@render children()}</div>
 
 <div class="buttons">
 	{#if step > 0}
@@ -76,6 +76,11 @@
 
 		:global(:last-child) {
 			margin-bottom: 0;
+		}
+
+		&.isInteractive {
+			user-select: none;
+			pointer-events: none;
 		}
 	}
 

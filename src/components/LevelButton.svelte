@@ -3,12 +3,19 @@
 
 	interface Props {
 		level: Level
+		active?: boolean
+		disabled?: boolean
 	}
 
-	let { level }: Props = $props()
+	let { level, active, disabled }: Props = $props()
 </script>
 
-<a class="button level" href="/level/{level.id}">
+<a
+	class="button level"
+	class:active
+	aria-disabled={disabled}
+	href={disabled ? undefined : `/level/${level.id}`}
+>
 	{#if level.number !== undefined}
 		<div class="number">{level.number}</div>
 	{/if}
@@ -25,7 +32,19 @@
 		line-height: 1.2rem;
 		padding: 1rem;
 		background-color: #fff1;
-		@include helper.focus-background(#fff2);
+
+		&[aria-disabled='true'] {
+			opacity: 0.5;
+			cursor: default;
+		}
+
+		&:not([aria-disabled='true']) {
+			@include helper.focus-background(#fff2);
+		}
+
+		&.active {
+			outline: 0.2rem solid #fffa;
+		}
 	}
 
 	.number {

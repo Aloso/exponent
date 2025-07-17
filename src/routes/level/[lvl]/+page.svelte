@@ -27,7 +27,7 @@
 
 	function finish() {
 		addCompletedLevel(level.id)
-		if (nextLevel) goto(`/level/${nextLevel.id}`)
+		if (nextLevel) goto(`/level/${nextLevel.id}`, { replaceState: true })
 		else goto('/')
 	}
 

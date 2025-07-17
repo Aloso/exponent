@@ -34,7 +34,7 @@
 	})
 
 	$effect(() => {
-		console.log(printPos(pos))
+		// console.log(printPos(pos))
 	})
 
 	const handlers = {
@@ -45,7 +45,9 @@
 	}
 
 	export function move(direction: Direction) {
-		triggerMove({ direction, oldPos: pos, newPos: calculateNext(pos, direction) })
+		const newPos = calculateNext(pos, direction)
+		if (!newPos) return
+		triggerMove({ direction, oldPos: pos, newPos })
 	}
 
 	function triggerMove(event: MoveEvent) {
@@ -124,7 +126,7 @@
 	}
 
 	export function canUndo() {
-		return pos !== lastPos && pos.moveCount > 0
+		return pos.moveCount > lastPos.moveCount
 	}
 
 	export function undo() {
@@ -141,11 +143,11 @@
 		}
 	}
 
-	function calculateNext(pos: Pos, direction: Direction): Pos {
+	function calculateNext(pos: Pos, direction: Direction): Pos | undefined {
 		const newSquares = gameLogic(pos.squares, direction)
 		if (newSquares === pos.squares) {
 			// no move was done
-			return pos
+			return
 		}
 
 		const state = finishMoveAndAddNumber(newSquares, goal)

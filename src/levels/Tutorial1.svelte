@@ -39,7 +39,11 @@
 		}
 	})
 
+	let prevStep = 0
 	$effect(() => {
+		if (step === prevStep) return
+		prevStep = step
+
 		switch (step) {
 			case 1:
 				field.setPos(
