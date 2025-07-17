@@ -153,7 +153,7 @@
 	}
 </script>
 
-<div class="field">
+<div class="field" style="--aspect-ratio: {pos.squares.length / pos.squares[0].length}">
 	<div class="outer">
 		<div class="inner">
 			{#each pos.squares as row}
@@ -178,7 +178,7 @@
 		width: 90%;
 		height: 0;
 		margin: 0 auto;
-		padding-bottom: 90%;
+		padding-bottom: calc(90% * var(--aspect-ratio));
 		animation: appear-from-center 0.3s ease forwards;
 	}
 
@@ -200,7 +200,7 @@
 		border-radius: 1rem;
 		width: 100%;
 		height: 100%;
-		padding: 1rem;
+		padding: 0.5rem;
 	}
 
 	.inner {
@@ -208,8 +208,6 @@
 		width: 100%;
 		height: 100%;
 		grid-template-columns: 1fr 1fr 1fr 1fr;
-		grid-template-rows: 1fr 1fr 1fr 1fr;
-		gap: 4%;
 	}
 
 	.goal {

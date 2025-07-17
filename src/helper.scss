@@ -12,7 +12,6 @@
 }
 
 @function move-shadows($n, $colors) {
-	@debug $n $colors;
 	$res: ();
 	@for $i from 1 through list.length($colors) {
 		$to-append: 0 #{math.min($i, $n) * -10px} 0 #{list.nth($colors, $i)};

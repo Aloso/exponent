@@ -50,6 +50,43 @@ export const emptyPos: Pos = {
 	moveCount: 0,
 }
 
+export const emptyPos4x5: Pos = {
+	squares: [
+		[
+			{ variant: 'normal', id: 0 },
+			{ variant: 'normal', id: 1 },
+			{ variant: 'normal', id: 2 },
+			{ variant: 'normal', id: 3 },
+		],
+		[
+			{ variant: 'normal', id: 4 },
+			{ variant: 'normal', id: 5 },
+			{ variant: 'normal', id: 6 },
+			{ variant: 'normal', id: 7 },
+		],
+		[
+			{ variant: 'normal', id: 8 },
+			{ variant: 'normal', id: 9 },
+			{ variant: 'normal', id: 10 },
+			{ variant: 'normal', id: 11 },
+		],
+		[
+			{ variant: 'normal', id: 12 },
+			{ variant: 'normal', id: 13 },
+			{ variant: 'normal', id: 14 },
+			{ variant: 'normal', id: 15 },
+		],
+		[
+			{ variant: 'normal', id: 16 },
+			{ variant: 'normal', id: 17 },
+			{ variant: 'normal', id: 18 },
+			{ variant: 'normal', id: 19 },
+		],
+	],
+	state: 'playing',
+	moveCount: 0,
+}
+
 export function update(pos: Pos, callback: (newPos: Pos) => void): Pos {
 	const updated: Pos = {
 		squares: pos.squares.map((row) => row.map((sq) => ({ ...sq }))),
@@ -117,6 +154,19 @@ export const levels: Level[] = [
 		pos: update(emptyPos, (pos) => {
 			pos.squares[2][1].effects = ['black-hole']
 			pos.squares[2][2].num = 2
+		}),
+		goal: 256,
+	},
+	{
+		id: 'colorful-mix',
+		number: 6,
+		name: 'Bunte Mischung',
+		pos: update(emptyPos4x5, (pos) => {
+			pos.squares[1][1].effects = ['black-hole']
+			pos.squares[2][2].variant = 'wall'
+			pos.squares[3][3].variant = 'wall'
+			pos.squares[4][2].variant = 'empty'
+			pos.squares[4][0].num = 2
 		}),
 		goal: 256,
 	},
