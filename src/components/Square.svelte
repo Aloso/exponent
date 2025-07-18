@@ -17,17 +17,12 @@
 	let oldSquares = $derived.by<OldSquare[]>(() => {
 		const ani = square.animation
 		if (!ani) return []
-		if (ani.kind === 'merge') {
-			const num = ani.oldNum
-			const label = getLabel(num)
-			return [
-				{ num, label, animation: { kind: 'move', x: ani.x1, y: ani.y1 } },
-				{ num, label, animation: { kind: 'move', x: ani.x2, y: ani.y2 } },
-			]
-		} else if (ani.kind === 'vanish') {
-			const num = ani.oldNum
-			const label = getLabel(num)
-			return [{ num, label, animation: { kind: 'move-vanish', x: ani.x, y: ani.y } }]
+		if (ani.kind === 'merge' || ani.kind === 'vanish') {
+			return ani.old.map((old) => ({
+				num: old.num,
+				label: getLabel(old.num),
+				animation: { kind: ani.kind === 'merge' ? 'move' : 'move-vanish', x: old.x, y: old.y },
+			}))
 		} else {
 			return []
 		}
@@ -65,8 +60,10 @@
 		class:full={square.num !== undefined}
 		class:wall={square.variant === 'wall'}
 		class:black-hole={!!square.effects?.includes('black-hole')}
+		class:mouth={square.variant === 'mouth'}
 		data-num={square.num}
 		data-ani={oldSquares.length === 2 ? 'appear-merge' : square.animation?.kind}
+		data-direction={square.direction}
 		style={square.animation?.kind === 'move'
 			? `--ani-x: ${square.animation.x}; --ani-y: ${square.animation.y}`
 			: undefined}
@@ -175,6 +172,24 @@
 		&[data-ani='appear-merge'] {
 			animation: appear-fast 0.25s ease-out forwards;
 			z-index: 2;
+		}
+
+		&.mouth {
+			background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiI+CiAgPHBhdGggZD0iTTgsMiBBNiw2LDI3MCwxLDAsMTQsOCBMOCw4IiBmaWxsPSJ3aGl0ZSIgLz4KPC9zdmc+');
+			opacity: 0.7;
+
+			&[data-direction='up'] {
+				transform: rotate(-225deg) !important;
+			}
+			&[data-direction='down'] {
+				transform: rotate(-45deg) !important;
+			}
+			&[data-direction='left'] {
+				transform: rotate(45deg) !important;
+			}
+			&[data-direction='right'] {
+				transform: rotate(225deg) !important;
+			}
 		}
 
 		@keyframes appear-fast {

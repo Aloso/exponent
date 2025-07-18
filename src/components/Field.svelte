@@ -34,7 +34,7 @@
 	})
 
 	$effect(() => {
-		// console.log(printPos(pos))
+		console.log(printPos(pos))
 	})
 
 	const handlers = {

@@ -1,10 +1,12 @@
 import type { Direction } from './events'
 import { iterateField } from './position'
-import type { Square } from './square'
+import type { Square, SquareAnimationOld } from './square'
 
 export function gameLogic(squares: Square[][], direction: Direction) {
 	const newSquares = squares.map((row) =>
-		row.map(({ id, variant, effects, num, goal }): Square => ({ id, variant, effects, num, goal })),
+		row.map(({ id, variant, effects, num, goal, direction }): Square => {
+			return { id, variant, effects, num, goal, direction }
+		}),
 	)
 	let moves = 0
 
@@ -21,6 +23,22 @@ export function gameLogic(squares: Square[][], direction: Direction) {
 				if (head.variant === 'empty' || head.variant === 'wall') {
 					incTail()
 				}
+			} else if (tail.variant === 'mouth') {
+				if (tail.direction !== direction) {
+					incTail()
+				} else if (head.num !== undefined) {
+					const old: SquareAnimationOld = { ...moveAnimation(hx - tx, hy - ty), num: head.num }
+					head.num = undefined
+					if (tail.animation && tail.animation.kind === 'vanish') {
+						tail.animation.old.push(old)
+					} else {
+						tail.animation = { kind: 'vanish', old: [old] }
+					}
+					moves++
+					incHead()
+				} else {
+					incHead()
+				}
 			} else if (head.num !== undefined) {
 				if (head.num === tail.num && !tail.effects?.includes('black-hole')) {
 					// merge
@@ -34,7 +52,13 @@ export function gameLogic(squares: Square[][], direction: Direction) {
 						y2 = tail.animation.y
 					}
 					const move = moveAnimation(hx - tx, hy - ty)
-					tail.animation = { kind: 'merge', x1: move.x, y1: move.y, x2, y2, oldNum }
+					tail.animation = {
+						kind: 'merge',
+						old: [
+							{ ...move, num: oldNum },
+							{ x: x2, y: y2, num: oldNum },
+						],
+					}
 
 					head.num = undefined
 					moves++
@@ -44,7 +68,10 @@ export function gameLogic(squares: Square[][], direction: Direction) {
 					// move or vanish
 					if (tail.effects?.includes('black-hole')) {
 						const oldNum = head.num
-						tail.animation = { kind: 'vanish', ...moveAnimation(hx - tx, hy - ty), oldNum }
+						tail.animation = {
+							kind: 'vanish',
+							old: [{ ...moveAnimation(hx - tx, hy - ty), num: oldNum }],
+						}
 						incTail()
 					} else {
 						tail.num = head.num
@@ -89,9 +116,7 @@ export function finishMoveAndAddNumber(
 	}
 
 	const availableFields = squares.flatMap((row) =>
-		row.filter(
-			(s) => s.num === undefined && s.variant === 'normal' && !s.effects?.includes('black-hole'),
-		),
+		row.filter((s) => s.num === undefined && s.variant === 'normal' && !s.effects?.length),
 	)
 
 	if (availableFields.length > 0) {

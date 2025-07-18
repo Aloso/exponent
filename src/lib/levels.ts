@@ -201,6 +201,24 @@ export const levels: Level[] = [
 		}),
 		goal: { fields: 1 },
 	},
+	{
+		id: 'hungry-mouths',
+		number: 9,
+		name: 'Hungrige Münder',
+		pos: update(emptyPos, (pos) => {
+			pos.squares[0][0].variant = 'mouth'
+			pos.squares[3][0].variant = 'mouth'
+			pos.squares[3][3].variant = 'mouth'
+			pos.squares[0][3].variant = 'mouth'
+			pos.squares[0][0].direction = 'up'
+			pos.squares[3][0].direction = 'left'
+			pos.squares[3][3].direction = 'down'
+			pos.squares[0][3].direction = 'right'
+
+			pos.squares[2][2].num = 2
+		}),
+		goal: 128,
+	},
 ]
 
 export function getNextLevel() {
