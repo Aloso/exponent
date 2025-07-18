@@ -217,7 +217,7 @@ export const levels: Level[] = [
 
 			pos.squares[2][2].num = 2
 		}),
-		goal: 128,
+		goal: 64,
 	},
 ]
 
