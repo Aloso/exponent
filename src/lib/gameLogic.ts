@@ -1,8 +1,9 @@
 import type { Direction } from './events'
+import type { LevelMode } from './modes'
 import { cleanSquares, iterateField } from './position'
 import type { Square, SquareAnimationOld } from './square'
 
-export function gameLogic(squares: Square[][], direction: Direction) {
+export function gameLogic(mode: LevelMode, squares: Square[][], direction: Direction) {
 	const newSquares = cleanSquares(squares)
 	let moves = 0
 
@@ -36,48 +37,56 @@ export function gameLogic(squares: Square[][], direction: Direction) {
 					incHead()
 				}
 			} else if (head.num !== undefined) {
-				if (head.num === tail.num && !tail.effects?.includes('black-hole')) {
-					// merge
-					const oldNum = tail.num
-					tail.num *= 2
-
-					let x2 = 0,
-						y2 = 0
-					if (tail.animation?.kind === 'move') {
-						x2 = tail.animation.x
-						y2 = tail.animation.y
-					}
-					const move = moveAnimation(hx - tx, hy - ty)
-					tail.animation = {
-						kind: 'merge',
-						old: [
-							{ ...move, num: oldNum },
-							{ x: x2, y: y2, num: oldNum },
-						],
-					}
-
-					head.num = undefined
-					moves++
-					incHead()
-					incTail()
-				} else if (tail.num === undefined && tail.variant === 'normal') {
-					// move or vanish
-					if (tail.effects?.includes('black-hole')) {
-						const oldNum = head.num
-						tail.animation = {
-							kind: 'vanish',
-							old: [{ ...moveAnimation(hx - tx, hy - ty), num: oldNum }],
+				if (tail.num === undefined) {
+					if (tail.variant === 'normal') {
+						// move or vanish
+						if (tail.effects?.includes('black-hole')) {
+							const oldNum = head.num
+							tail.animation = {
+								kind: 'vanish',
+								old: [{ ...moveAnimation(hx - tx, hy - ty), num: oldNum }],
+							}
+							incTail()
+						} else {
+							tail.num = head.num
+							tail.animation = { kind: 'move', ...moveAnimation(hx - tx, hy - ty) }
 						}
+						head.num = undefined
+						moves++
+						incHead()
+					} else {
+						incTail()
+					}
+				} else {
+					const combined = mode.combine(head.num, tail.num)
+					if (combined !== undefined && !tail.effects?.includes('black-hole')) {
+						// merge
+						const headNum = head.num
+						const tailNum = tail.num
+						tail.num = combined
+
+						let x2 = 0,
+							y2 = 0
+						if (tail.animation?.kind === 'move') {
+							x2 = tail.animation.x
+							y2 = tail.animation.y
+						}
+						const move = moveAnimation(hx - tx, hy - ty)
+						tail.animation = {
+							kind: 'merge',
+							old: [
+								{ ...move, num: headNum },
+								{ x: x2, y: y2, num: tailNum },
+							],
+						}
+
+						head.num = undefined
+						moves++
+						incHead()
 						incTail()
 					} else {
-						tail.num = head.num
-						tail.animation = { kind: 'move', ...moveAnimation(hx - tx, hy - ty) }
+						incTail()
 					}
-					head.num = undefined
-					moves++
-					incHead()
-				} else {
-					incTail()
 				}
 			} else {
 				if (head.variant === 'wall') {
@@ -96,6 +105,7 @@ export function gameLogic(squares: Square[][], direction: Direction) {
 }
 
 export function finishMoveAndAddNumber(
+	mode: LevelMode,
 	squares: Square[][],
 	goal?: number | { fields: number },
 ): 'playing' | 'won' | 'lost' {
@@ -117,14 +127,14 @@ export function finishMoveAndAddNumber(
 
 	if (availableFields.length > 0) {
 		const idx = (Math.random() * availableFields.length) | 0
-		availableFields[idx].num = 2
+		availableFields[idx].num = mode.create()
 		availableFields[idx].animation = { kind: 'appear' }
 
 		if (availableFields.length === 1) {
 			// field is full after this move
 			let moveIsPossible = false
 			for (const direction of ['up', 'down', 'left', 'right'] as const) {
-				if (gameLogic(squares, direction) !== squares) {
+				if (gameLogic(mode, squares, direction) !== squares) {
 					// move succeeded
 					moveIsPossible = true
 					break

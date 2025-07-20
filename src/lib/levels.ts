@@ -4,6 +4,7 @@ import { appState } from './appState.svelte'
 import type { Pos } from './position'
 import type Field from '../components/Field.svelte'
 import { parsePosition } from './parse'
+import { defaultMode, fibMode, logarithmicMode, type LevelMode } from './modes'
 
 export interface LevelOverlayProps {
 	pos: Pos
@@ -18,75 +19,15 @@ export interface Level {
 	pos: Pos
 	overlay?: Component<LevelOverlayProps>
 	goal?: number | { fields: number }
+	mode: LevelMode
 }
 
-export const emptyPos: Pos = {
-	squares: [
-		[
-			{ variant: 'normal', id: 0 },
-			{ variant: 'normal', id: 1 },
-			{ variant: 'normal', id: 2 },
-			{ variant: 'normal', id: 3 },
-		],
-		[
-			{ variant: 'normal', id: 4 },
-			{ variant: 'normal', id: 5 },
-			{ variant: 'normal', id: 6 },
-			{ variant: 'normal', id: 7 },
-		],
-		[
-			{ variant: 'normal', id: 8 },
-			{ variant: 'normal', id: 9 },
-			{ variant: 'normal', id: 10 },
-			{ variant: 'normal', id: 11 },
-		],
-		[
-			{ variant: 'normal', id: 12 },
-			{ variant: 'normal', id: 13 },
-			{ variant: 'normal', id: 14 },
-			{ variant: 'normal', id: 15 },
-		],
-	],
-	state: 'playing',
-	moveCount: 0,
-}
-
-export const emptyPos4x5: Pos = {
-	squares: [
-		[
-			{ variant: 'normal', id: 0 },
-			{ variant: 'normal', id: 1 },
-			{ variant: 'normal', id: 2 },
-			{ variant: 'normal', id: 3 },
-		],
-		[
-			{ variant: 'normal', id: 4 },
-			{ variant: 'normal', id: 5 },
-			{ variant: 'normal', id: 6 },
-			{ variant: 'normal', id: 7 },
-		],
-		[
-			{ variant: 'normal', id: 8 },
-			{ variant: 'normal', id: 9 },
-			{ variant: 'normal', id: 10 },
-			{ variant: 'normal', id: 11 },
-		],
-		[
-			{ variant: 'normal', id: 12 },
-			{ variant: 'normal', id: 13 },
-			{ variant: 'normal', id: 14 },
-			{ variant: 'normal', id: 15 },
-		],
-		[
-			{ variant: 'normal', id: 16 },
-			{ variant: 'normal', id: 17 },
-			{ variant: 'normal', id: 18 },
-			{ variant: 'normal', id: 19 },
-		],
-	],
-	state: 'playing',
-	moveCount: 0,
-}
+export const emptyPos = parsePosition(
+	`n n n n
+	n n n n
+	n n n n
+	n n n n`,
+)
 
 export function update(pos: Pos, callback: (newPos: Pos) => void): Pos {
 	const updated: Pos = {
@@ -109,6 +50,7 @@ export const levels: Level[] = [
 			n n n n`,
 		),
 		overlay: Tutorial1,
+		mode: defaultMode,
 	},
 	{
 		id: 'classic-128',
@@ -121,6 +63,7 @@ export const levels: Level[] = [
 			n n n n`,
 		),
 		goal: 128,
+		mode: defaultMode,
 	},
 	{
 		id: 'classic-256',
@@ -133,6 +76,7 @@ export const levels: Level[] = [
 			n n n n`,
 		),
 		goal: 256,
+		mode: defaultMode,
 	},
 	{
 		id: 'walls-128',
@@ -145,6 +89,7 @@ export const levels: Level[] = [
 			n n n n`,
 		),
 		goal: 128,
+		mode: defaultMode,
 	},
 	{
 		id: 'empty-256',
@@ -157,6 +102,7 @@ export const levels: Level[] = [
 			- n n -`,
 		),
 		goal: 256,
+		mode: defaultMode,
 	},
 	{
 		id: 'black-hole',
@@ -169,6 +115,7 @@ export const levels: Level[] = [
 			n n n n`,
 		),
 		goal: 256,
+		mode: defaultMode,
 	},
 	{
 		id: 'colorful-mix',
@@ -182,6 +129,7 @@ export const levels: Level[] = [
 			+2 n - n`,
 		),
 		goal: 256,
+		mode: defaultMode,
 	},
 	{
 		id: 'target-areas',
@@ -195,6 +143,7 @@ export const levels: Level[] = [
 			n g64 - -`,
 		),
 		goal: { fields: 2 },
+		mode: defaultMode,
 	},
 	{
 		id: 'remote-target',
@@ -208,6 +157,7 @@ export const levels: Level[] = [
 			n n n g256`,
 		),
 		goal: { fields: 1 },
+		mode: defaultMode,
 	},
 	{
 		id: 'hungry-mouths',
@@ -220,6 +170,33 @@ export const levels: Level[] = [
 			ml n n md`,
 		),
 		goal: 64,
+		mode: defaultMode,
+	},
+	{
+		id: 'logarithmic',
+		number: 10,
+		name: 'Logarithmus',
+		pos: parsePosition(
+			`n n n n
+			n n n n
+			n +1 n n
+			n n n n`,
+		),
+		goal: 9,
+		mode: logarithmicMode,
+	},
+	{
+		id: 'fibonacchi',
+		number: 11,
+		name: 'Fibonacchi-Folge',
+		pos: parsePosition(
+			`n n n n
+			n n n n
+			n +1 n n
+			n n n n`,
+		),
+		goal: 233,
+		mode: fibMode,
 	},
 ]
 

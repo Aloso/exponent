@@ -2,6 +2,7 @@
 	import { emptyPos, update, type LevelOverlayProps } from '$lib/levels'
 	import { onMount } from 'svelte'
 	import TutorialOverlay from '../components/TutorialOverlay.svelte'
+	import { parsePosition } from '$lib/parse'
 
 	let { field, onFinished }: LevelOverlayProps = $props()
 
@@ -16,12 +17,18 @@
 				step === 3
 			) {
 				if (step === 1) {
-					event.newPos = update(emptyPos, (pos) => {
-						pos.squares[2][3].num = 2
-						pos.squares[2][3].animation = { kind: 'move', x: -1, y: 0 }
-						pos.squares[0][3].num = 2
-						pos.squares[0][3].animation = { kind: 'appear' }
-					})
+					event.newPos = parsePosition(
+						`n n n n
+						n n n n
+						n n n n
+						n n n n`,
+						(pos) => {
+							pos.squares[2][3].num = 2
+							pos.squares[2][3].animation = { kind: 'move', x: -1, y: 0 }
+							pos.squares[0][3].num = 2
+							pos.squares[0][3].animation = { kind: 'appear' }
+						},
+					)
 					setTimeout(() => step++, 500)
 				} else if (step === 2) {
 					setTimeout(() => step++, 500)

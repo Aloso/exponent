@@ -144,13 +144,13 @@
 	}
 
 	function calculateNext(pos: Pos, direction: Direction): Pos | undefined {
-		const newSquares = gameLogic(pos.squares, direction)
+		const newSquares = gameLogic(level.mode, pos.squares, direction)
 		if (newSquares === pos.squares) {
 			// no move was done
 			return
 		}
 
-		const state = finishMoveAndAddNumber(newSquares, goal)
+		const state = finishMoveAndAddNumber(level.mode, newSquares, goal)
 		return { squares: newSquares, state, moveCount: pos.moveCount + 1 }
 	}
 </script>
@@ -160,7 +160,7 @@
 		<div class="inner">
 			{#each pos.squares as row}
 				{#each row as square}
-					<SquareComponent {square} />
+					<SquareComponent {square} mode={level.mode} />
 				{/each}
 			{/each}
 		</div>

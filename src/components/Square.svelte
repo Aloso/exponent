@@ -1,16 +1,19 @@
 <script lang="ts">
+	import type { LevelMode } from '$lib/modes'
 	import type { Square } from '$lib/square'
 
 	interface Props {
 		square: Square
+		mode: LevelMode
 	}
 
-	let { square }: Props = $props()
+	let { square, mode }: Props = $props()
 	let label = $derived(getLabel(square.num))
 
 	interface OldSquare {
 		num: number
 		label: string
+		color: string
 		animation: { kind: 'move' | 'move-vanish'; x: number; y: number }
 	}
 
@@ -21,6 +24,7 @@
 			return ani.old.map((old) => ({
 				num: old.num,
 				label: getLabel(old.num),
+				color: mode.getColor(old.num),
 				animation: { kind: ani.kind === 'merge' ? 'move' : 'move-vanish', x: old.x, y: old.y },
 			}))
 		} else {
@@ -47,9 +51,8 @@
 	{#each oldSquares as old}
 		<div
 			class="square d{old.label.length} full"
-			data-num={old.num}
 			data-ani={old.animation.kind}
-			style="--ani-x: {old.animation.x}; --ani-y: {old.animation.y}"
+			style="--ani-x: {old.animation.x}; --ani-y: {old.animation.y}; --color: {old.color}"
 		>
 			{old.label}
 		</div>
@@ -61,12 +64,12 @@
 		class:wall={square.variant === 'wall'}
 		class:black-hole={!!square.effects?.includes('black-hole')}
 		class:mouth={square.variant === 'mouth'}
-		data-num={square.num}
 		data-ani={oldSquares.length === 2 ? 'appear-merge' : square.animation?.kind}
 		data-direction={square.direction}
-		style={square.animation?.kind === 'move'
+		style="{square.num ? `--color: ${mode.getColor(square.num)};` : ''}
+		{square.animation?.kind === 'move'
 			? `--ani-x: ${square.animation.x}; --ani-y: ${square.animation.y}`
-			: undefined}
+			: ''}"
 	>
 		{label}
 	</div>
@@ -112,42 +115,8 @@
 		border-radius: 0.3rem;
 
 		&.full {
-			background-color: #fff3;
+			background-color: var(--color, #fff3);
 			box-shadow: inset 0 -0.5rem 0 #00000017;
-
-			&[data-num='2'] {
-				background-color: #9c5408;
-			}
-			&[data-num='4'] {
-				background-color: #9c2108;
-			}
-			&[data-num='8'] {
-				background-color: #b50887;
-			}
-			&[data-num='16'] {
-				background-color: #6408b5;
-			}
-			&[data-num='32'] {
-				background-color: #0a19c5;
-			}
-			&[data-num='64'] {
-				background-color: #0a64c5;
-			}
-			&[data-num='128'] {
-				background-color: #039965;
-			}
-			&[data-num='256'] {
-				background-color: #128415;
-			}
-			&[data-num='512'] {
-				background-color: #6bae0c;
-			}
-			&[data-num='1024'] {
-				background-color: #d1d511;
-			}
-			&[data-num='2048'] {
-				background-color: #f4a810;
-			}
 		}
 
 		&.wall {

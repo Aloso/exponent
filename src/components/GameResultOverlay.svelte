@@ -57,6 +57,7 @@
 		display: flex;
 		gap: 1rem;
 		justify-content: flex-end;
+		flex-wrap: wrap;
 		left: 0;
 		right: 0;
 		bottom: 0;
