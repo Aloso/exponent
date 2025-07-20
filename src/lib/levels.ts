@@ -3,6 +3,7 @@ import Tutorial1 from '../levels/Tutorial1.svelte'
 import { appState } from './appState.svelte'
 import type { Pos } from './position'
 import type Field from '../components/Field.svelte'
+import { parsePosition } from './parse'
 
 export interface LevelOverlayProps {
 	pos: Pos
@@ -101,122 +102,123 @@ export const levels: Level[] = [
 	{
 		id: 'tutorial-01',
 		name: 'Tutorial',
-		pos: update(emptyPos, (pos) => {
-			pos.squares[2][2].num = 2
-		}),
+		pos: parsePosition(
+			`n n n n
+			n n n n
+			n n +2 n
+			n n n n`,
+		),
 		overlay: Tutorial1,
 	},
 	{
 		id: 'classic-128',
 		number: 1,
 		name: 'Classic',
-		pos: update(emptyPos, (pos) => {
-			pos.squares[2][2].num = 2
-		}),
+		pos: parsePosition(
+			`n n n n
+			n n n n
+			n n +2 n
+			n n n n`,
+		),
 		goal: 128,
 	},
 	{
 		id: 'classic-256',
 		number: 2,
 		name: 'Classic',
-		pos: update(emptyPos, (pos) => {
-			pos.squares[2][2].num = 2
-		}),
+		pos: parsePosition(
+			`n n n n
+			n n n n
+			n n +2 n
+			n n n n`,
+		),
 		goal: 256,
 	},
 	{
 		id: 'walls-128',
 		number: 3,
 		name: 'Blockaden',
-		pos: update(emptyPos, (pos) => {
-			pos.squares[0][0].variant = 'wall'
-			pos.squares[1][2].variant = 'wall'
-			pos.squares[2][2].num = 2
-		}),
+		pos: parsePosition(
+			`X n n n
+			n n X n
+			n n +2 n
+			n n n n`,
+		),
 		goal: 128,
 	},
 	{
 		id: 'empty-256',
 		number: 4,
 		name: 'Die Leere',
-		pos: update(emptyPos, (pos) => {
-			pos.squares[3][0].variant = 'empty'
-			pos.squares[3][3].variant = 'empty'
-			pos.squares[0][1].variant = 'empty'
-			pos.squares[2][2].num = 2
-		}),
+		pos: parsePosition(
+			`n - n n
+			n n n n
+			n n +2 n
+			- n n -`,
+		),
 		goal: 256,
 	},
 	{
 		id: 'black-hole',
 		number: 5,
 		name: 'Schwarzes Loch',
-		pos: update(emptyPos, (pos) => {
-			pos.squares[2][1].effects = ['black-hole']
-			pos.squares[2][2].num = 2
-		}),
+		pos: parsePosition(
+			`n n n n
+			n n n n
+			n b +2 n
+			n n n n`,
+		),
 		goal: 256,
 	},
 	{
 		id: 'colorful-mix',
 		number: 6,
 		name: 'Bunte Mischung',
-		pos: update(emptyPos4x5, (pos) => {
-			pos.squares[1][1].effects = ['black-hole']
-			pos.squares[2][2].variant = 'wall'
-			pos.squares[3][3].variant = 'wall'
-			pos.squares[4][2].variant = 'empty'
-			pos.squares[4][0].num = 2
-		}),
+		pos: parsePosition(
+			`n n n n
+			n b n n
+			n n X n
+			n n n X
+			+2 n - n`,
+		),
 		goal: 256,
 	},
 	{
 		id: 'target-areas',
 		number: 7,
 		name: 'Zielfelder',
-		pos: update(emptyPos4x5, (pos) => {
-			pos.squares[0][0].variant = 'empty'
-			pos.squares[0][1].variant = 'empty'
-			pos.squares[4][2].variant = 'empty'
-			pos.squares[4][3].variant = 'empty'
-
-			pos.squares[0][2].goal = 64
-			pos.squares[4][1].goal = 64
-			pos.squares[3][2].num = 2
-		}),
+		pos: parsePosition(
+			`- - g64 n
+			n n n n
+			n n n n
+			n n +2 n
+			n g64 - -`,
+		),
 		goal: { fields: 2 },
 	},
 	{
 		id: 'remote-target',
 		number: 8,
 		name: 'Entlegener Ort',
-		pos: update(emptyPos4x5, (pos) => {
-			pos.squares[1][0].variant = 'empty'
-			pos.squares[1][1].variant = 'wall'
-			pos.squares[3][2].variant = 'wall'
-			pos.squares[3][3].variant = 'empty'
-			pos.squares[4][3].goal = 256
-
-			pos.squares[2][2].num = 2
-		}),
+		pos: parsePosition(
+			`n n n n
+			- X n n
+			n n +2 n
+			n n X -
+			n n n g256`,
+		),
 		goal: { fields: 1 },
 	},
 	{
 		id: 'hungry-mouths',
 		number: 9,
 		name: 'Hungrige Münder',
-		pos: update(emptyPos, (pos) => {
-			pos.squares[0][0].variant = 'mouth'
-			pos.squares[3][0].variant = 'mouth'
-			pos.squares[3][3].variant = 'mouth'
-			pos.squares[0][3].variant = 'mouth'
-			pos.squares[0][0].direction = 'up'
-			pos.squares[3][0].direction = 'left'
-			pos.squares[3][3].direction = 'down'
-			pos.squares[0][3].direction = 'right'
-
-			pos.squares[2][2].num = 2
-		}),
+		pos: parsePosition(
+			`mu n n mr
+			n n n n
+			n n +2 n
+			ml n n md`,
+		),
 		goal: 64,
 	},
 ]

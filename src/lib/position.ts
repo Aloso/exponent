@@ -74,3 +74,11 @@ export function iterateField(
 		}
 	}
 }
+
+export function cleanSquares(squares: Square[][]): Square[][] {
+	return squares.map((row) =>
+		row.map(({ id, variant, effects, num, goal, direction }): Square => {
+			return { id, variant, effects, num, goal, direction }
+		}),
+	)
+}

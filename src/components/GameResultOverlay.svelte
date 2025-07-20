@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte'
+	import Gestures from './Gestures.svelte'
 
 	interface Props {
 		children: Snippet
@@ -12,6 +13,8 @@
 <div class="backdrop"></div>
 
 <div class="overlay">{@render children()}</div>
+
+<Gestures onMove={() => {}} />
 
 <div class="buttons">
 	{#each actions as action}

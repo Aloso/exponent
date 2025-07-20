@@ -1,5 +1,8 @@
+import { cleanSquares, type Pos } from './position'
+
 export interface Config {
 	completedLevels: CompletedLevel[]
+	currentLevel?: { id: string; pos: Pos }
 	initialized: boolean
 }
 
@@ -20,6 +23,7 @@ export function loadConfig() {
 	if (stored) {
 		const newState = JSON.parse(stored) as Config
 		appState.completedLevels = newState.completedLevels
+		appState.currentLevel = newState.currentLevel
 	}
 	appState.initialized = true
 }
@@ -31,5 +35,14 @@ export function saveConfig() {
 export function addCompletedLevel(id: string) {
 	if (!appState.completedLevels.some((lvl) => lvl.id === id)) {
 		appState.completedLevels.push({ id, timestamp: Date.now() })
+		appState.currentLevel = undefined
 	}
+}
+
+export function setLevelState(id: string, pos: Pos) {
+	appState.currentLevel = { id, pos: { ...pos, squares: cleanSquares(pos.squares) } }
+}
+
+export function resetLevelState() {
+	appState.currentLevel = undefined
 }

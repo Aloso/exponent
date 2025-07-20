@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
-	import { addCompletedLevel } from '$lib/appState.svelte'
+	import { addCompletedLevel, appState, resetLevelState, setLevelState } from '$lib/appState.svelte'
 	import { levels, type Level } from '$lib/levels'
 	import { onMount } from 'svelte'
 	import Field from '../../../components/Field.svelte'
@@ -16,23 +16,32 @@
 	let pos = $state(level.pos)
 	let field = $state<Field>()
 	let levelResult: 'won' | 'lost' | undefined = $state()
+	let saved = $derived(appState.currentLevel)
 
 	$effect(() => {
 		level
 		levelResult = undefined
 	})
 
+	$effect(() => {
+		if (saved && pos.moveCount === 0 && saved.pos.moveCount > 2 && saved.id === level.id) {
+			console.log(`level restored (move ${saved.pos.moveCount})`)
+			field?.setPos(saved.pos, false)
+			pos = saved.pos
+		}
+	})
+
 	let levelIndex = $derived(levels.findIndex((l) => l.id === level.id))
 	let nextLevel = $derived(levels[levelIndex + 1])
 
 	function finish() {
-		addCompletedLevel(level.id)
 		if (nextLevel) goto(`/level/${nextLevel.id}`, { replaceState: true })
 		else goto('/')
 	}
 
 	function reset() {
 		field?.setPos(level.pos)
+		pos = level.pos
 		levelResult = undefined
 	}
 
@@ -43,17 +52,31 @@
 
 	onMount(() => {
 		const winHandler = field!.on('win', (event) => {
+			addCompletedLevel(level.id)
 			if (!level.overlay) levelResult = 'won'
 			return event
 		})
 		const loseHandler = field!.on('lose', (event) => {
+			resetLevelState()
 			if (!level.overlay) levelResult = 'lost'
+			return event
+		})
+		const moveHandler = field!.on('move', (event) => {
+			setLevelState(level.id, event.newPos)
+			pos = event.newPos
+			return event
+		})
+		const undoHandler = field!.on('undo', (event) => {
+			setLevelState(level.id, event.newPos)
+			pos = event.newPos
 			return event
 		})
 
 		return () => {
 			field!.off('win', winHandler)
 			field!.off('lose', loseHandler)
+			field!.off('move', moveHandler)
+			field!.off('undo', undoHandler)
 		}
 	})
 </script>
@@ -67,7 +90,10 @@
 {:else if levelResult}
 	{#if levelResult === 'won'}
 		<GameResultOverlay
-			actions={[{ label: nextLevel ? 'Nächster Level' : 'Zum Hauptmenü', action: finish }]}
+			actions={[
+				{ label: 'Wiederholen', action: reset },
+				{ label: nextLevel ? 'Nächster Level' : 'Zum Hauptmenü', action: finish },
+			]}
 		>
 			<h1>Level {level.number ?? ''} abgeschlossen</h1>
 			<p class="emoji">🎉</p>

@@ -1,13 +1,9 @@
 import type { Direction } from './events'
-import { iterateField } from './position'
+import { cleanSquares, iterateField } from './position'
 import type { Square, SquareAnimationOld } from './square'
 
 export function gameLogic(squares: Square[][], direction: Direction) {
-	const newSquares = squares.map((row) =>
-		row.map(({ id, variant, effects, num, goal, direction }): Square => {
-			return { id, variant, effects, num, goal, direction }
-		}),
-	)
+	const newSquares = cleanSquares(squares)
 	let moves = 0
 
 	iterateField(
