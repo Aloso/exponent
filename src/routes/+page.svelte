@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { getNextLevel } from '$lib/levels'
+	import { goto } from '$app/navigation'
+	import { allowUndo } from '$lib/canUndo'
 	import { useSpaInstallation } from '$lib/useSpaInstallation.svelte'
 
 	let installation = useSpaInstallation()
@@ -8,7 +9,13 @@
 <div class="content">
 	<h1>Exponent</h1>
 	<p>Ein Spiel von Lu</p>
-	<a class="button start-button" href="/level">Start</a>
+	<button
+		class="start-button"
+		onclick={() => {
+			allowUndo()
+			goto('/level')
+		}}>Start</button
+	>
 	<button
 		class="install-button"
 		class:hidden={installation.installed}

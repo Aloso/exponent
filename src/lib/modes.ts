@@ -3,6 +3,7 @@ export interface LevelMode {
 	getColor: (n: number) => string
 	combine: (a: number, b: number) => number | undefined
 	create: () => number
+	hidden?: boolean
 }
 
 const colors = [
@@ -19,10 +20,12 @@ const colors = [
 	'#d1d511',
 	'#f4a810',
 	'#db7100',
+	'#ef2504',
+	'#ef0c6c',
 ]
 
 const powersOfTwo: Map<number, number> = new Map()
-for (let i = 0; i < 11; i++) {
+for (let i = 0; i < 15; i++) {
 	powersOfTwo.set(2 ** i, i)
 }
 

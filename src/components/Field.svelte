@@ -13,7 +13,7 @@
 	import type { Level } from '$lib/levels'
 	import { printPos, type Pos } from '$lib/position'
 	import SquareComponent from './Square.svelte'
-	import { finishMoveAndAddNumber, gameLogic } from '$lib/gameLogic'
+	import { checkGameState, finishMoveAndAddNumber, gameLogic } from '$lib/gameLogic'
 	import Gestures from './Gestures.svelte'
 
 	interface Props {
@@ -143,6 +143,13 @@
 		}
 	}
 
+	export function checkGame() {
+		const state = checkGameState(pos.squares, level.goal)
+		if (state === 'won' || state === 'lost') {
+			return state
+		}
+	}
+
 	function calculateNext(pos: Pos, direction: Direction): Pos | undefined {
 		const newSquares = gameLogic(level.mode, pos.squares, direction)
 		if (newSquares === pos.squares) {
@@ -155,7 +162,12 @@
 	}
 </script>
 
-<div class="field" style="--aspect-ratio: {pos.squares.length / pos.squares[0].length}">
+<div
+	class="field"
+	class:hidden-fields={level.mode.hidden}
+	style="--aspect-ratio: {pos.squares.length / pos.squares[0].length}; --columns: {pos.squares[0]
+		.length}"
+>
 	<div class="outer">
 		<div class="inner">
 			{#each pos.squares as row}
@@ -188,6 +200,10 @@
 		margin: 0 auto;
 		padding-bottom: calc(90% * var(--aspect-ratio));
 		animation: appear-from-center 0.3s ease forwards;
+
+		&.hidden-fields {
+			color: transparent !important;
+		}
 	}
 
 	@keyframes appear-from-center {
@@ -215,7 +231,7 @@
 		display: grid;
 		width: 100%;
 		height: 100%;
-		grid-template-columns: 1fr 1fr 1fr 1fr;
+		grid-template-columns: repeat(var(--columns), 1fr);
 	}
 
 	.goal {

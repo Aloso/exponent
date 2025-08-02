@@ -109,6 +109,37 @@ export function finishMoveAndAddNumber(
 	squares: Square[][],
 	goal?: number | { fields: number },
 ): 'playing' | 'won' | 'lost' {
+	const state = checkGameState(squares, goal)
+	if (state === 'lost' || state === 'won') {
+		return state
+	}
+
+	const idx = (Math.random() * state.available.length) | 0
+	state.available[idx].num = mode.create()
+	state.available[idx].animation = { kind: 'appear' }
+
+	if (state.available.length === 1) {
+		// field is full after this move
+		let moveIsPossible = false
+		for (const direction of ['up', 'down', 'left', 'right'] as const) {
+			if (gameLogic(mode, squares, direction) !== squares) {
+				// move succeeded
+				moveIsPossible = true
+				break
+			}
+		}
+		if (!moveIsPossible) {
+			return 'lost'
+		}
+	}
+
+	return 'playing'
+}
+
+export function checkGameState(
+	squares: Square[][],
+	goal?: number | { fields: number },
+): { available: Square[]; highest: number } | 'won' | 'lost' {
 	let highestNumber = 0
 	for (const row of squares) {
 		for (const square of row) {
@@ -126,29 +157,10 @@ export function finishMoveAndAddNumber(
 	)
 
 	if (availableFields.length > 0) {
-		const idx = (Math.random() * availableFields.length) | 0
-		availableFields[idx].num = mode.create()
-		availableFields[idx].animation = { kind: 'appear' }
-
-		if (availableFields.length === 1) {
-			// field is full after this move
-			let moveIsPossible = false
-			for (const direction of ['up', 'down', 'left', 'right'] as const) {
-				if (gameLogic(mode, squares, direction) !== squares) {
-					// move succeeded
-					moveIsPossible = true
-					break
-				}
-			}
-			if (!moveIsPossible) {
-				return 'lost'
-			}
-		}
+		return { available: availableFields, highest: highestNumber }
 	} else {
 		return 'lost'
 	}
-
-	return 'playing'
 }
 
 function moveAnimation(x: number, y: number) {

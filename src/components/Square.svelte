@@ -117,6 +117,16 @@
 		&.full {
 			background-color: var(--color, #fff3);
 			box-shadow: inset 0 -0.5rem 0 #00000017;
+
+			:global(.hidden-fields) &::after {
+				position: absolute;
+				content: '?';
+				color: #fff7;
+				left: 0;
+				right: 0;
+				text-align: center;
+				font-size: calc(0.3 * var(--app-width) / var(--columns, 4));
+			}
 		}
 
 		&.wall {
@@ -222,28 +232,28 @@
 		}
 
 		&.d1 {
-			font-size: calc(0.075 * var(--app-width));
+			font-size: calc(0.3 * var(--app-width) / var(--columns, 4));
 		}
 		&.d2 {
-			font-size: calc(0.065 * var(--app-width));
+			font-size: calc(0.26 * var(--app-width) / var(--columns, 4));
 		}
 		&.d3 {
-			font-size: calc(0.055 * var(--app-width));
+			font-size: calc(0.22 * var(--app-width) / var(--columns, 4));
 		}
 		&.d4 {
-			font-size: calc(0.05 * var(--app-width));
+			font-size: calc(0.2 * var(--app-width) / var(--columns, 4));
 		}
 		&.d5 {
-			font-size: calc(0.045 * var(--app-width));
+			font-size: calc(0.18 * var(--app-width) / var(--columns, 4));
 		}
 		&.d6 {
-			font-size: calc(0.04 * var(--app-width));
+			font-size: calc(0.16 * var(--app-width) / var(--columns, 4));
 		}
 		&.d7 {
-			font-size: calc(0.0375 * var(--app-width));
+			font-size: calc(0.15 * var(--app-width) / var(--columns, 4));
 		}
 		&.d8 {
-			font-size: calc(0.035 * var(--app-width));
+			font-size: calc(0.14 * var(--app-width) / var(--columns, 4));
 		}
 	}
 </style>

@@ -198,6 +198,47 @@ export const levels: Level[] = [
 		goal: 233,
 		mode: fibMode,
 	},
+	{
+		id: 'diagonal',
+		number: 12,
+		name: 'Diagonale',
+		pos: parsePosition(
+			`b n n n n n
+			n b n n n n
+			n +1 b n n n
+			n n n b n n
+			n n n n b n
+			n n n n n b`,
+		),
+		goal: 8,
+		mode: logarithmicMode,
+	},
+	{
+		id: 'classic-2048',
+		number: 13,
+		name: 'Classic 2048',
+		pos: parsePosition(
+			`n n n n
+			n n n n
+			n n n +2
+			n n n n`,
+		),
+		goal: 2048,
+		mode: defaultMode,
+	},
+	{
+		id: 'memory',
+		number: 14,
+		name: 'Memory',
+		pos: parsePosition(
+			`n n n n
+			n n n n
+			n n n +2
+			n n n n`,
+		),
+		goal: 128,
+		mode: { ...defaultMode, hidden: true },
+	},
 ]
 
 export function getNextLevel() {

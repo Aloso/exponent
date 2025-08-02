@@ -20,7 +20,7 @@
 
 	$effect(() => {
 		level
-		levelResult = undefined
+		levelResult = field?.checkGame()
 	})
 
 	$effect(() => {

@@ -14,10 +14,10 @@
 
 <div class="overlay">{@render children()}</div>
 
-<Gestures onMove={() => {}} />
+<Gestures zIndex={101} onMove={() => {}} />
 
 <div class="buttons">
-	{#each actions as action}
+	{#each actions as action (action.label)}
 		<button class="button" onclick={action.action}>{action.label}</button>
 	{/each}
 </div>
@@ -63,7 +63,7 @@
 		bottom: 0;
 		padding: 2rem;
 		font-size: 1.25rem;
-		z-index: 100;
+		z-index: 102;
 		animation: appear-slowly 1s ease forwards;
 
 		.button {

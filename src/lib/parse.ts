@@ -2,6 +2,19 @@ import type { Direction } from './events'
 import type { Pos } from './position'
 import type { Square } from './square'
 
+/**
+ * Parses a string to a position, where each row is delimited by a line break, and fields are separated by spaces.
+ *
+ * The following notations are available:
+ *
+ * - `-` empty
+ * - `+N` normal, initially contains the number N
+ * - `n` normal
+ * - `X` wall
+ * - `b` black hole
+ * - `mD` mouth, where `D` is the direction (`l`: left, `r`: right, `u`: up, `d`: down)
+ * - `gN` goal field, where N is the goal value
+ */
 export function parsePosition(positionString: string, update?: (pos: Pos) => void): Pos {
 	let id = 0
 	const squares = positionString.split('\n').map((row) =>

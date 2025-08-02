@@ -3,10 +3,11 @@
 	import { onMount } from 'svelte'
 
 	interface Props {
+		zIndex?: number
 		onMove: (direction: Direction) => void
 	}
 
-	let { onMove }: Props = $props()
+	let { zIndex, onMove }: Props = $props()
 	let gestureCanvas = $state<HTMLElement>()
 
 	function getDirection(dx: number, dy: number): Direction | undefined {
@@ -116,7 +117,7 @@
 	})
 </script>
 
-<div class="gesture-canvas" bind:this={gestureCanvas}></div>
+<div class="gesture-canvas" bind:this={gestureCanvas} style:z-index={zIndex}></div>
 
 <style lang="scss">
 	.gesture-canvas {
