@@ -2,6 +2,7 @@
 	import { onMount, type Snippet } from 'svelte'
 	import { loadConfig, saveConfig } from '$lib/appState.svelte'
 	import './styles.scss'
+	import { finalizeMusic, initMusic } from '$lib/audio.svelte'
 
 	interface Props {
 		children: Snippet
@@ -12,6 +13,9 @@
 
 	onMount(() => {
 		loadConfig()
+		initMusic()
+
+		return finalizeMusic
 	})
 	$effect(() => {
 		saveConfig()

@@ -6,7 +6,7 @@
 
 	interface Props {
 		back?: boolean
-		children: Snippet
+		children?: Snippet
 		action?: Snippet
 	}
 
@@ -38,10 +38,14 @@
 				<path d="M15,8 L1,8 L6,2 L1,8 L6,14 L1,8" />
 			</svg>
 		</button>
+	{:else}
+		<div></div>
 	{/if}
 
 	<h1>
-		{@render children()}
+		{#if children}
+			{@render children()}
+		{/if}
 	</h1>
 
 	<div class="right">

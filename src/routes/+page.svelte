@@ -2,9 +2,18 @@
 	import { goto } from '$app/navigation'
 	import { allowUndo } from '$lib/canUndo'
 	import { useSpaInstallation } from '$lib/useSpaInstallation.svelte'
+	import Header from '../components/Header.svelte'
+	import MusicButton from '../components/MusicButton.svelte'
 
 	let installation = useSpaInstallation()
 </script>
+
+<Header>
+	{''}
+	{#snippet action()}
+		<MusicButton />
+	{/snippet}
+</Header>
 
 <div class="content">
 	<h1>Exponent</h1>

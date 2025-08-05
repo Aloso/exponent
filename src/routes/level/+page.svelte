@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { appState } from '$lib/appState.svelte'
+	import { musicState, togglePaused } from '$lib/audio.svelte'
 	import { getNextLevel, levels } from '$lib/levels'
 	import Header from '../../components/Header.svelte'
 	import LevelButton from '../../components/LevelButton.svelte'
+	import MusicButton from '../../components/MusicButton.svelte'
 
 	let nextLevel = $derived(getNextLevel())
 	let nextLevelIndex = $derived(
@@ -21,7 +23,12 @@
 	})
 </script>
 
-<Header back>Übersicht</Header>
+<Header back>
+	Übersicht
+	{#snippet action()}
+		<MusicButton />
+	{/snippet}
+</Header>
 
 {#if suggestedLevel}
 	<div class="suggested-level">
