@@ -20,7 +20,20 @@ export interface Level {
 	overlay?: Component<LevelOverlayProps>
 	goal?: number | { fields: number }
 	mode: LevelMode
+	rules: LevelRule[]
 }
+
+export type LevelRule =
+	| 'default'
+	| 'logarithmic'
+	| 'fibonacchi'
+	| 'tutorial'
+	| 'hidden'
+	| 'empty'
+	| 'walls'
+	| 'black-holes'
+	| 'target-fields'
+	| 'mouths'
 
 export const emptyPos = parsePosition(
 	`n n n n
@@ -51,6 +64,8 @@ export const levels: Level[] = [
 		),
 		overlay: Tutorial1,
 		mode: defaultMode,
+		rules: ['default', 'tutorial'],
+		goal: 16,
 	},
 	{
 		id: 'classic-128',
@@ -64,6 +79,7 @@ export const levels: Level[] = [
 		),
 		goal: 128,
 		mode: defaultMode,
+		rules: ['default'],
 	},
 	{
 		id: 'classic-256',
@@ -77,6 +93,7 @@ export const levels: Level[] = [
 		),
 		goal: 256,
 		mode: defaultMode,
+		rules: ['default'],
 	},
 	{
 		id: 'walls-128',
@@ -90,6 +107,7 @@ export const levels: Level[] = [
 		),
 		goal: 128,
 		mode: defaultMode,
+		rules: ['default', 'walls'],
 	},
 	{
 		id: 'empty-256',
@@ -103,6 +121,7 @@ export const levels: Level[] = [
 		),
 		goal: 256,
 		mode: defaultMode,
+		rules: ['default', 'empty'],
 	},
 	{
 		id: 'black-hole',
@@ -116,6 +135,7 @@ export const levels: Level[] = [
 		),
 		goal: 256,
 		mode: defaultMode,
+		rules: ['default', 'black-holes'],
 	},
 	{
 		id: 'colorful-mix',
@@ -130,6 +150,7 @@ export const levels: Level[] = [
 		),
 		goal: 256,
 		mode: defaultMode,
+		rules: ['default', 'empty', 'walls', 'black-holes'],
 	},
 	{
 		id: 'target-areas',
@@ -144,6 +165,7 @@ export const levels: Level[] = [
 		),
 		goal: { fields: 2 },
 		mode: defaultMode,
+		rules: ['default', 'empty'],
 	},
 	{
 		id: 'remote-target',
@@ -158,6 +180,7 @@ export const levels: Level[] = [
 		),
 		goal: { fields: 1 },
 		mode: defaultMode,
+		rules: ['default', 'empty', 'walls', 'target-fields'],
 	},
 	{
 		id: 'hungry-mouths',
@@ -171,6 +194,7 @@ export const levels: Level[] = [
 		),
 		goal: 64,
 		mode: defaultMode,
+		rules: ['default', 'mouths'],
 	},
 	{
 		id: 'logarithmic',
@@ -184,6 +208,7 @@ export const levels: Level[] = [
 		),
 		goal: 9,
 		mode: logarithmicMode,
+		rules: ['default', 'logarithmic'],
 	},
 	{
 		id: 'fibonacchi',
@@ -197,6 +222,7 @@ export const levels: Level[] = [
 		),
 		goal: 233,
 		mode: fibMode,
+		rules: ['default', 'fibonacchi'],
 	},
 	{
 		id: 'diagonal',
@@ -212,6 +238,7 @@ export const levels: Level[] = [
 		),
 		goal: 8,
 		mode: logarithmicMode,
+		rules: ['default', 'black-holes', 'logarithmic'],
 	},
 	{
 		id: 'classic-2048',
@@ -225,6 +252,7 @@ export const levels: Level[] = [
 		),
 		goal: 2048,
 		mode: defaultMode,
+		rules: ['default'],
 	},
 	{
 		id: 'memory',
@@ -238,6 +266,7 @@ export const levels: Level[] = [
 		),
 		goal: 128,
 		mode: { ...defaultMode, hidden: true },
+		rules: ['default', 'hidden'],
 	},
 ]
 

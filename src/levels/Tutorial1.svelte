@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { emptyPos, update, type LevelOverlayProps } from '$lib/levels'
+	import { emptyPos, levels, update, type LevelOverlayProps } from '$lib/levels'
 	import { onMount } from 'svelte'
 	import TutorialOverlay from '../components/TutorialOverlay.svelte'
 	import { parsePosition } from '$lib/parse'
+	import { addCompletedLevel } from '$lib/appState.svelte'
 
 	let { field, onFinished }: LevelOverlayProps = $props()
 
@@ -10,7 +11,12 @@
 	let isInteractive = $derived(step === 1 || step === 2 || step === 3)
 
 	onMount(() => {
-		const handler = field.on('move', (event) => {
+		const winHandler = field!.on('win', (event) => {
+			addCompletedLevel(levels[0].id)
+			return event
+		})
+
+		const moveHandler = field.on('move', (event) => {
 			if (
 				(step === 1 && event.direction === 'right') ||
 				(step === 2 && event.direction === 'down') ||
@@ -42,7 +48,8 @@
 		})
 
 		return () => {
-			field.off('move', handler)
+			field!.off('win', winHandler)
+			field.off('move', moveHandler)
 		}
 	})
 

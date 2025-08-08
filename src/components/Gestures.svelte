@@ -1,14 +1,23 @@
 <script lang="ts">
 	import type { Direction } from '$lib/events'
-	import { onMount } from 'svelte'
+	import type { Snippet } from 'svelte'
 
 	interface Props {
 		zIndex?: number
 		onMove: (direction: Direction) => void
+		surface?: HTMLElement
+		onClick?: () => void
+		children?: Snippet
 	}
 
-	let { zIndex, onMove }: Props = $props()
+	let { zIndex, onMove, surface = $bindable(), onClick, children }: Props = $props()
 	let gestureCanvas = $state<HTMLElement>()
+
+	$effect(() => {
+		if (gestureCanvas) {
+			surface = gestureCanvas
+		}
+	})
 
 	function getDirection(dx: number, dy: number): Direction | undefined {
 		const distance = Math.sqrt(dx * dx + dy * dy)
@@ -31,7 +40,10 @@
 		}
 	}
 
-	onMount(() => {
+	$effect(() => {
+		if (!surface) return
+		const eventTarget = surface
+
 		const keyDownHandler = (event: KeyboardEvent) => {
 			if (event.key === 'ArrowLeft') onMove('left')
 			else if (event.key === 'ArrowRight') onMove('right')
@@ -83,41 +95,59 @@
 			}
 		}
 
+		const endHandler = (event: PointerEvent | TouchEvent) => {
+			if (gestureStart && onClick) {
+				const [x, y] =
+					event instanceof PointerEvent
+						? [event.clientX, event.clientY]
+						: [event.touches[0].clientX, event.touches[0].clientY]
+				const dx = x - gestureStart.x
+				const dy = y - gestureStart.y
+				if (dx * dx + dy * dy < 20) onClick()
+			}
+
+			gestureStart = undefined
+		}
+
 		const cancelHandler = () => {
 			gestureStart = undefined
 		}
 
 		window.addEventListener('keydown', keyDownHandler)
 		if ('ontouchstart' in document.documentElement) {
-			gestureCanvas!.addEventListener('touchstart', touchStartHandler, { passive: false })
-			gestureCanvas!.addEventListener('touchmove', touchMoveHandler, { passive: false })
-			gestureCanvas!.addEventListener('touchend', cancelHandler)
-			gestureCanvas!.addEventListener('touchcancel', cancelHandler)
+			eventTarget.addEventListener('touchstart', touchStartHandler, { passive: false })
+			window.addEventListener('touchmove', touchMoveHandler, { passive: false })
+			window.addEventListener('touchend', endHandler)
+			window.addEventListener('touchcancel', cancelHandler)
 		} else {
-			gestureCanvas!.addEventListener('pointerdown', pointerDownHandler, { passive: false })
-			gestureCanvas!.addEventListener('pointermove', pointerMoveHandler, { passive: false })
-			gestureCanvas!.addEventListener('pointerup', cancelHandler)
-			gestureCanvas!.addEventListener('pointercancel', cancelHandler)
+			eventTarget.addEventListener('pointerdown', pointerDownHandler, { passive: false })
+			window.addEventListener('pointermove', pointerMoveHandler, { passive: false })
+			window.addEventListener('pointerup', endHandler)
+			window.addEventListener('pointercancel', cancelHandler)
 		}
 
 		return () => {
 			window.removeEventListener('keydown', keyDownHandler)
 			if ('ontouchstart' in document.documentElement) {
-				gestureCanvas!.removeEventListener('touchstart', touchStartHandler)
-				gestureCanvas!.removeEventListener('touchmove', touchMoveHandler)
-				gestureCanvas!.removeEventListener('touchend', cancelHandler)
-				gestureCanvas!.removeEventListener('touchcancel', cancelHandler)
+				eventTarget.removeEventListener('touchstart', touchStartHandler)
+				window.removeEventListener('touchmove', touchMoveHandler)
+				window.removeEventListener('touchend', endHandler)
+				window.removeEventListener('touchcancel', cancelHandler)
 			} else {
-				gestureCanvas!.removeEventListener('pointerdown', pointerDownHandler)
-				gestureCanvas!.removeEventListener('pointermove', pointerMoveHandler)
-				gestureCanvas!.removeEventListener('pointerup', cancelHandler)
-				gestureCanvas!.removeEventListener('pointercancel', cancelHandler)
+				eventTarget.removeEventListener('pointerdown', pointerDownHandler)
+				window.removeEventListener('pointermove', pointerMoveHandler)
+				window.removeEventListener('pointerup', endHandler)
+				window.removeEventListener('pointercancel', cancelHandler)
 			}
 		}
 	})
 </script>
 
-<div class="gesture-canvas" bind:this={gestureCanvas} style:z-index={zIndex}></div>
+{#if children}
+	{@render children()}
+{:else}
+	<div class="gesture-canvas" bind:this={gestureCanvas} style:z-index={zIndex}></div>
+{/if}
 
 <style lang="scss">
 	.gesture-canvas {

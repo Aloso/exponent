@@ -9,7 +9,6 @@
 </script>
 
 <Header>
-	{''}
 	{#snippet action()}
 		<MusicButton />
 	{/snippet}

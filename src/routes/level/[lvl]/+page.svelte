@@ -6,6 +6,7 @@
 	import Field from '../../../components/Field.svelte'
 	import GameResultOverlay from '../../../components/GameResultOverlay.svelte'
 	import LevelHeader from '../../../components/LevelHeader.svelte'
+	import GameRules from '../../../components/GameRules.svelte'
 
 	interface Props {
 		data: Level
@@ -20,7 +21,9 @@
 
 	$effect(() => {
 		level
-		levelResult = field?.checkGame()
+		queueMicrotask(() => {
+			levelResult = field?.checkGame()
+		})
 	})
 
 	$effect(() => {
@@ -33,6 +36,8 @@
 
 	let levelIndex = $derived(levels.findIndex((l) => l.id === level.id))
 	let nextLevel = $derived(levels[levelIndex + 1])
+
+	let extraSurface = $state<{ surface: HTMLElement; onClick: () => void }>()
 
 	function finish() {
 		if (nextLevel) goto(`/level/${nextLevel.id}`, { replaceState: true })
@@ -83,7 +88,9 @@
 
 <LevelHeader {level} {undo} canUndo={field?.canUndo()} />
 
-<Field {level} bind:this={field} />
+<Field {level} bind:this={field} {extraSurface} />
+
+<GameRules rules={level.rules} onMove={field?.move} />
 
 {#if level.overlay}
 	<level.overlay {pos} {field} onFinished={finish} />
