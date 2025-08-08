@@ -96,14 +96,8 @@
 		}
 
 		const endHandler = (event: PointerEvent | TouchEvent) => {
-			if (gestureStart && onClick) {
-				const [x, y] =
-					event instanceof PointerEvent
-						? [event.clientX, event.clientY]
-						: [event.touches[0].clientX, event.touches[0].clientY]
-				const dx = x - gestureStart.x
-				const dy = y - gestureStart.y
-				if (dx * dx + dy * dy < 20) onClick()
+			if (gestureStart && onClick && event.target === surface) {
+				onClick()
 			}
 
 			gestureStart = undefined

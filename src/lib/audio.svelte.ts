@@ -19,9 +19,11 @@ export function initMusic() {
 		musicState.initialized = true
 		music.addEventListener('play', () => {
 			musicState.paused = false
+			console.log('music playing')
 		})
 		music.addEventListener('pause', () => {
 			musicState.paused = true
+			console.log('music paused')
 		})
 		music.addEventListener('abort', () => {
 			musicState.paused = true
