@@ -165,7 +165,7 @@ export const levels: Level[] = [
 		),
 		goal: { fields: 2 },
 		mode: defaultMode,
-		rules: ['default', 'empty'],
+		rules: ['default', 'empty', 'target-fields'],
 	},
 	{
 		id: 'remote-target',

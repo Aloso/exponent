@@ -88,7 +88,7 @@
 
 <LevelHeader {level} {undo} canUndo={field?.canUndo()} />
 
-<Field {level} bind:this={field} {extraSurface} />
+<Field {level} bind:this={field} />
 
 <GameRules rules={level.rules} onMove={field?.move} />
 

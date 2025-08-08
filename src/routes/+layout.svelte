@@ -3,6 +3,7 @@
 	import { loadConfig, saveConfig } from '$lib/appState.svelte'
 	import './styles.scss'
 	import { finalizeMusic, initMusic } from '$lib/audio.svelte'
+	import { setStartTime } from '$lib/startTime'
 
 	interface Props {
 		children: Snippet
@@ -14,6 +15,7 @@
 	onMount(() => {
 		loadConfig()
 		initMusic()
+		setStartTime()
 
 		return finalizeMusic
 	})

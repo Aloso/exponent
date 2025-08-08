@@ -2,10 +2,19 @@
 	import { goto } from '$app/navigation'
 	import { allowUndo } from '$lib/canUndo'
 	import { useSpaInstallation } from '$lib/useSpaInstallation.svelte'
+	import { onMount } from 'svelte'
 	import Header from '../components/Header.svelte'
 	import MusicButton from '../components/MusicButton.svelte'
+	import { shouldUpdate } from '$lib/startTime'
 
 	let installation = useSpaInstallation()
+	let shouldReload = $state(false)
+
+	onMount(async () => {
+		if (!shouldReload) {
+			shouldReload = await shouldUpdate()
+		}
+	})
 </script>
 
 <Header>
@@ -30,6 +39,11 @@
 		onclick={installation.installApp}
 	>
 		Installieren
+	</button>
+
+	<p class:hidden={!shouldReload}>Eine neue Version ist verfügbar.</p>
+	<button class="reload-button" class:hidden={!shouldReload} onclick={() => location.reload()}>
+		Neu laden
 	</button>
 </div>
 
@@ -67,14 +81,11 @@
 		);
 	}
 
-	.install-button {
+	.install-button,
+	.reload-button {
 		background-color: #fff1;
 		padding-block: 0.5rem;
 		@include helper.focus-background(#fff2);
-
-		&.hidden {
-			visibility: hidden;
-		}
 	}
 
 	.start-button {
@@ -82,5 +93,9 @@
 		padding-block: 0.5rem;
 		font-size: 1.75rem;
 		@include helper.focus-background(#922dff70);
+	}
+
+	.hidden {
+		visibility: hidden;
 	}
 </style>
