@@ -6,9 +6,11 @@
 	import Header from '../components/Header.svelte'
 	import MusicButton from '../components/MusicButton.svelte'
 	import { shouldUpdate } from '$lib/startTime'
+	import { areAllLevelsCompleted } from '$lib/appState.svelte'
 
 	let installation = useSpaInstallation()
 	let shouldReload = $state(false)
+	let showLevelBuilder = $derived(areAllLevelsCompleted())
 
 	onMount(async () => {
 		if (!shouldReload) {
@@ -30,7 +32,7 @@
 		class="start-button"
 		onclick={() => {
 			allowUndo()
-			goto('/level')
+			goto('/campaign')
 		}}>Start</button
 	>
 	<button
@@ -45,6 +47,10 @@
 	<button class="reload-button" class:hidden={!shouldReload} onclick={() => location.reload()}>
 		Neu laden
 	</button>
+
+	<a href="/level-builder" class="button level-builder-button" class:hidden={!showLevelBuilder}>
+		Level Builder
+	</a>
 </div>
 
 <style lang="scss">
@@ -82,7 +88,8 @@
 	}
 
 	.install-button,
-	.reload-button {
+	.reload-button,
+	.level-builder-button {
 		background-color: #fff1;
 		padding-block: 0.5rem;
 		@include helper.focus-background(#fff2);

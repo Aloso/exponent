@@ -5,9 +5,11 @@
 	interface Props {
 		square: Square
 		mode: LevelMode
+		highlights?: string
+		onclick: () => void
 	}
 
-	let { square, mode }: Props = $props()
+	let { square, mode, highlights, onclick }: Props = $props()
 	let label = $derived(getLabel(square.num))
 
 	interface OldSquare {
@@ -43,7 +45,7 @@
 	}
 </script>
 
-<div class="square-bg" class:empty={square.variant === 'empty'}>
+<button class="square-bg" class:empty={square.variant === 'empty'} style={highlights} {onclick}>
 	{#if square.goal}
 		<div class="goal">{square.goal}+</div>
 	{/if}
@@ -73,10 +75,12 @@
 	>
 		{label}
 	</div>
-</div>
+</button>
 
 <style lang="scss">
 	.square-bg {
+		display: flex;
+		justify-content: center;
 		position: relative;
 		margin: 8%;
 		border-radius: 0.3rem;

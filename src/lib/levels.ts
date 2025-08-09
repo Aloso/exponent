@@ -59,7 +59,7 @@ export const levels: Level[] = [
 		pos: parsePosition(
 			`n n n n
 			n n n n
-			n n +2 n
+			n n n+2 n
 			n n n n`,
 		),
 		overlay: Tutorial1,
@@ -74,7 +74,7 @@ export const levels: Level[] = [
 		pos: parsePosition(
 			`n n n n
 			n n n n
-			n n +2 n
+			n n n+2 n
 			n n n n`,
 		),
 		goal: 128,
@@ -88,7 +88,7 @@ export const levels: Level[] = [
 		pos: parsePosition(
 			`n n n n
 			n n n n
-			n n +2 n
+			n n n+2 n
 			n n n n`,
 		),
 		goal: 256,
@@ -102,7 +102,7 @@ export const levels: Level[] = [
 		pos: parsePosition(
 			`X n n n
 			n n X n
-			n n +2 n
+			n n n+2 n
 			n n n n`,
 		),
 		goal: 128,
@@ -116,7 +116,7 @@ export const levels: Level[] = [
 		pos: parsePosition(
 			`n - n n
 			n n n n
-			n n +2 n
+			n n n+2 n
 			- n n -`,
 		),
 		goal: 256,
@@ -130,7 +130,7 @@ export const levels: Level[] = [
 		pos: parsePosition(
 			`n n n n
 			n n n n
-			n b +2 n
+			n b n+2 n
 			n n n n`,
 		),
 		goal: 256,
@@ -146,7 +146,7 @@ export const levels: Level[] = [
 			n b n n
 			n n X n
 			n n n X
-			+2 n - n`,
+			n+2 n - n`,
 		),
 		goal: 256,
 		mode: defaultMode,
@@ -160,7 +160,7 @@ export const levels: Level[] = [
 			`- - g64 n
 			n n n n
 			n n n n
-			n n +2 n
+			n n n+2 n
 			n g64 - -`,
 		),
 		goal: { fields: 2 },
@@ -174,7 +174,7 @@ export const levels: Level[] = [
 		pos: parsePosition(
 			`n n n n
 			- X n n
-			n n +2 n
+			n n n+2 n
 			n n X -
 			n n n g256`,
 		),
@@ -189,7 +189,7 @@ export const levels: Level[] = [
 		pos: parsePosition(
 			`mu n n mr
 			n n n n
-			n n +2 n
+			n n n+2 n
 			ml n n md`,
 		),
 		goal: 64,
@@ -203,12 +203,12 @@ export const levels: Level[] = [
 		pos: parsePosition(
 			`n n n n
 			n n n n
-			n +1 n n
+			n n+1 n n
 			n n n n`,
 		),
 		goal: 9,
 		mode: logarithmicMode,
-		rules: ['default', 'logarithmic'],
+		rules: ['logarithmic'],
 	},
 	{
 		id: 'fibonacchi',
@@ -217,12 +217,12 @@ export const levels: Level[] = [
 		pos: parsePosition(
 			`n n n n
 			n n n n
-			n +1 n n
+			n n+1 n n
 			n n n n`,
 		),
 		goal: 233,
 		mode: fibMode,
-		rules: ['default', 'fibonacchi'],
+		rules: ['fibonacchi'],
 	},
 	{
 		id: 'diagonal',
@@ -231,14 +231,14 @@ export const levels: Level[] = [
 		pos: parsePosition(
 			`b n n n n n
 			n b n n n n
-			n +1 b n n n
+			n n+1 b n n n
 			n n n b n n
 			n n n n b n
 			n n n n n b`,
 		),
 		goal: 8,
 		mode: logarithmicMode,
-		rules: ['default', 'black-holes', 'logarithmic'],
+		rules: ['logarithmic', 'black-holes'],
 	},
 	{
 		id: 'classic-2048',
@@ -247,7 +247,7 @@ export const levels: Level[] = [
 		pos: parsePosition(
 			`n n n n
 			n n n n
-			n n n +2
+			n n n n+2
 			n n n n`,
 		),
 		goal: 2048,
@@ -261,7 +261,7 @@ export const levels: Level[] = [
 		pos: parsePosition(
 			`n n n n
 			n n n n
-			n n n +2
+			n n n n+2
 			n n n n`,
 		),
 		goal: 128,

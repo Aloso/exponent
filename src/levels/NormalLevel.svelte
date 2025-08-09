@@ -3,16 +3,17 @@
 	import { addCompletedLevel, appState, resetLevelState, setLevelState } from '$lib/appState.svelte'
 	import { levels, type Level } from '$lib/levels'
 	import { onMount } from 'svelte'
-	import Field from '../../../components/Field.svelte'
-	import GameResultOverlay from '../../../components/GameResultOverlay.svelte'
-	import LevelHeader from '../../../components/LevelHeader.svelte'
-	import GameRules from '../../../components/GameRules.svelte'
+	import Field from '../components/Field.svelte'
+	import GameResultOverlay from '../components/GameResultOverlay.svelte'
+	import LevelHeader from '../components/LevelHeader.svelte'
+	import GameRules from '../components/GameRules.svelte'
 
 	interface Props {
-		data: Level
+		level: Level
+		navigate: (levelId: string) => void
 	}
 
-	let { data: level }: Props = $props()
+	let { level, navigate }: Props = $props()
 
 	let pos = $state(level.pos)
 	let field = $state<Field>()
@@ -37,17 +38,17 @@
 	let levelIndex = $derived(levels.findIndex((l) => l.id === level.id))
 	let nextLevel = $derived(levels[levelIndex + 1])
 
-	let extraSurface = $state<{ surface: HTMLElement; onClick: () => void }>()
-
 	function finish() {
-		if (nextLevel) goto(`/level/${nextLevel.id}`, { replaceState: true })
+		if (nextLevel) navigate(nextLevel.id)
 		else goto('/')
 	}
 
 	function reset() {
-		field?.setPos(level.pos)
 		pos = level.pos
 		levelResult = undefined
+		queueMicrotask(() => {
+			field?.setPos(level.pos)
+		})
 	}
 
 	function undo() {

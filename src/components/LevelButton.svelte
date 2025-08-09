@@ -14,7 +14,7 @@
 	class="button level"
 	class:active
 	aria-disabled={disabled}
-	href={disabled ? undefined : `/level/${level.id}`}
+	href={disabled ? undefined : `/level?id=${level.id}`}
 >
 	{#if level.number !== undefined}
 		<div class="number">{level.number}</div>

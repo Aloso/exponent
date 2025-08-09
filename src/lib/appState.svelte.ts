@@ -1,3 +1,4 @@
+import { levels } from './levels'
 import { cleanSquares, type Pos } from './position'
 
 export interface Config {
@@ -45,4 +46,11 @@ export function setLevelState(id: string, pos: Pos) {
 
 export function resetLevelState() {
 	appState.currentLevel = undefined
+}
+
+export function areAllLevelsCompleted() {
+	return (
+		appState.initialized &&
+		levels.every((lvl) => appState.completedLevels.some((completed) => completed.id === lvl.id))
+	)
 }

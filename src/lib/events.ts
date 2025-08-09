@@ -19,7 +19,13 @@ export interface HistoryEvent {
 	newPos: Pos
 }
 
-export type GameEvent = MoveEvent | ResultEvent | HistoryEvent
+export interface ClickEvent {
+	action: 'click'
+	x: number
+	y: number
+}
+
+export type GameEvent = MoveEvent | ResultEvent | HistoryEvent | ClickEvent
 
 export type GameMoveHandler = (event: MoveEvent) => MoveEvent | undefined
 
@@ -27,4 +33,10 @@ export type GameResultHandler = (event: ResultEvent) => ResultEvent | undefined
 
 export type GameHistoryHandler = (event: HistoryEvent) => HistoryEvent | undefined
 
-export type FieldEventHandler = GameMoveHandler | GameResultHandler | GameHistoryHandler
+export type GameClickHandler = (event: ClickEvent) => ClickEvent | undefined
+
+export type FieldEventHandler =
+	| GameMoveHandler
+	| GameResultHandler
+	| GameHistoryHandler
+	| GameClickHandler

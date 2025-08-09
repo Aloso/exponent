@@ -8,16 +8,19 @@ import type { Square } from './square'
  * The following notations are available:
  *
  * - `-` empty
- * - `+N` normal, initially contains the number N
  * - `n` normal
  * - `X` wall
  * - `b` black hole
  * - `mD` mouth, where `D` is the direction (`l`: left, `r`: right, `u`: up, `d`: down)
  * - `gN` goal field, where N is the goal value
+ *
+ * Can be appended to normal fields:
+ *
+ * - `+N` means that it initially contains the number N
  */
 export function parsePosition(positionString: string, update?: (pos: Pos) => void): Pos {
 	let id = 0
-	const squares = positionString.split('\n').map((row) =>
+	const squares = positionString.split(/[\n|]/g).map((row) =>
 		row
 			.trim()
 			.split(' ')
@@ -29,24 +32,43 @@ export function parsePosition(positionString: string, update?: (pos: Pos) => voi
 }
 
 function parseSquare(squareString: string, id: number): Square {
-	switch (squareString[0]) {
+	const [before, after] = squareString.split('+')
+	let output: Square
+
+	switch (before[0]) {
 		case '-':
-			return { variant: 'empty', id }
-		case '+':
-			return { variant: 'normal', num: Number.parseInt(squareString.slice(1)), id }
+			output = { variant: 'empty', id }
+			break
 		case 'n':
-			return { variant: 'normal', id }
+			output = { variant: 'normal', id }
+			break
 		case 'X':
-			return { variant: 'wall', id }
+			output = { variant: 'wall', id }
+			break
 		case 'b':
-			return { variant: 'normal', id, effects: ['black-hole'] }
+			output = { variant: 'normal', id, effects: ['black-hole'] }
+			break
 		case 'm':
-			return { variant: 'mouth', id, direction: parseDirection(squareString[1]) }
+			output = { variant: 'mouth', id, direction: parseDirection(squareString[1]) }
+			break
 		case 'g':
-			return { variant: 'normal', goal: Number.parseInt(squareString.slice(1)), id }
+			output = { variant: 'normal', goal: Number.parseInt(squareString.slice(1)), id }
+			break
 		default:
-			throw new Error('invalid square')
+			throw new Error(`invalid square: '${before}'`)
 	}
+
+	if (after) {
+		const num = Number.parseInt(after)
+		if (Number.isNaN(num)) {
+			throw new Error('Invalid number')
+		}
+		if (output.variant !== 'normal') {
+			throw new Error(`Can't add number to ${output.variant} square`)
+		}
+		output.num = num
+	}
+	return output
 }
 
 function parseDirection(directionString: string): Direction {

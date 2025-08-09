@@ -15,29 +15,31 @@
 
 <div class="header">
 	{#if back}
-		<button
-			class="back-button"
-			onclick={() => {
-				if (browser && canUndo()) {
-					history.back()
-				} else {
-					goto('/', { replaceState: true })
-				}
-			}}
-			aria-label="Zurück"
-		>
-			<svg
-				class="back-icon"
-				xmlns="http://www.w3.org/2000/svg"
-				viewBox="0 0 16 16"
-				stroke="white"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
+		<div>
+			<button
+				class="back-button"
+				onclick={() => {
+					if (browser && canUndo()) {
+						history.back()
+					} else {
+						goto('/', { replaceState: true })
+					}
+				}}
+				aria-label="Zurück"
 			>
-				<path d="M15,8 L1,8 L6,2 L1,8 L6,14 L1,8" />
-			</svg>
-		</button>
+				<svg
+					class="back-icon"
+					xmlns="http://www.w3.org/2000/svg"
+					viewBox="0 0 16 16"
+					stroke="white"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<path d="M15,8 L1,8 L6,2 L1,8 L6,14 L1,8" />
+				</svg>
+			</button>
+		</div>
 	{:else}
 		<div></div>
 	{/if}

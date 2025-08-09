@@ -37,13 +37,13 @@
 					'Um zu gewinnen, muss auf jedem Zielfeld mindestens die abgebildete Zahl sein.',
 				]
 			case 'mouths':
-				return ['Münder', 'test']
+				return ['Münder', 'Ein Mund verschlingt alle Zahlen, die auf ihn zukommen']
 		}
 	})
 </script>
 
 <div class="row">
-	<em>{title}</em>: {description}
+	<em>{title}</em>: {@html description}
 </div>
 
 <style lang="scss">

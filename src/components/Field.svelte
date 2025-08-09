@@ -9,6 +9,8 @@
 		ResultEvent,
 		HistoryEvent,
 		Direction,
+		ClickEvent,
+		GameClickHandler,
 	} from '$lib/events'
 	import type { Level } from '$lib/levels'
 	import { printPos, type Pos } from '$lib/position'
@@ -18,9 +20,11 @@
 
 	interface Props {
 		level: Level
+		noGestures?: boolean
+		highlights?: string[][]
 	}
 
-	let { level }: Props = $props()
+	let { level, noGestures, highlights }: Props = $props()
 
 	let pos = $state(level.pos)
 	let lastPos = $state(level.pos)
@@ -42,6 +46,7 @@
 		win: [] as GameResultHandler[],
 		lose: [] as GameResultHandler[],
 		undo: [] as GameHistoryHandler[],
+		click: [] as GameClickHandler[],
 	}
 
 	export function move(direction: Direction) {
@@ -90,7 +95,8 @@
 	function triggerEvent(eventName: 'move', event: MoveEvent): MoveEvent | undefined
 	function triggerEvent(eventName: 'win' | 'lose', event: ResultEvent): ResultEvent | undefined
 	function triggerEvent(eventName: 'undo', event: HistoryEvent): HistoryEvent | undefined
-	function triggerEvent(eventName: 'move' | 'win' | 'lose' | 'undo', event: GameEvent) {
+	function triggerEvent(eventName: 'click', event: ClickEvent): ClickEvent | undefined
+	function triggerEvent(eventName: 'move' | 'win' | 'lose' | 'undo' | 'click', event: GameEvent) {
 		let actualEvent = event
 		for (const handler of handlers[eventName]) {
 			const next = handler(actualEvent as any)
@@ -103,13 +109,20 @@
 	export function on(eventName: 'move', handler: GameMoveHandler): GameMoveHandler
 	export function on(eventName: 'win' | 'lose', handler: GameResultHandler): GameResultHandler
 	export function on(eventName: 'undo', handler: GameHistoryHandler): GameHistoryHandler
-	export function on(eventName: 'move' | 'win' | 'lose' | 'undo', handler: FieldEventHandler) {
+	export function on(eventName: 'click', handler: GameClickHandler): GameClickHandler
+	export function on(
+		eventName: 'move' | 'win' | 'lose' | 'undo' | 'click',
+		handler: FieldEventHandler,
+	) {
 		console.log('registered event handler:', eventName)
 		handlers[eventName].push(handler as any)
 		return handler
 	}
 
-	export function off(eventName: 'move' | 'win' | 'lose' | 'undo', handler: FieldEventHandler) {
+	export function off(
+		eventName: 'move' | 'win' | 'lose' | 'undo' | 'click',
+		handler: FieldEventHandler,
+	) {
 		console.log('removed event handler:', eventName)
 		handlers[eventName] = handlers[eventName].filter((h) => h !== handler) as any
 	}
@@ -170,9 +183,14 @@
 >
 	<div class="outer">
 		<div class="inner">
-			{#each pos.squares as row}
-				{#each row as square}
-					<SquareComponent {square} mode={level.mode} />
+			{#each pos.squares as row, y}
+				{#each row as square, x}
+					<SquareComponent
+						{square}
+						mode={level.mode}
+						highlights={highlights?.[x][y]}
+						onclick={() => triggerEvent('click', { action: 'click', x, y })}
+					/>
 				{/each}
 			{/each}
 		</div>
@@ -189,7 +207,9 @@
 	{/if}
 {/if}
 
-<Gestures onMove={move} />
+{#if !noGestures}
+	<Gestures onMove={move} />
+{/if}
 
 <style lang="scss">
 	.field {
