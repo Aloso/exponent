@@ -3,16 +3,23 @@
 	import { onMount } from 'svelte'
 	import NormalLevel from '../../levels/NormalLevel.svelte'
 	import { goto } from '$app/navigation'
+	import { deserializeB64 } from '$lib/serde'
 
 	let level = $state<Level>()
 	let error = $state<string>()
 
 	onMount(() => {
 		let queryParams = new URLSearchParams(window.location.search)
-		let levelId = queryParams.get('id')
-		level = levels.find((lvl) => lvl.id === levelId)
-		if (!level) {
-			error = 'Level nicht gefunden'
+		if (queryParams.has('id')) {
+			let levelId = queryParams.get('id')
+			level = levels.find((lvl) => lvl.id === levelId)
+			if (!level) {
+				error = 'Level nicht gefunden'
+			}
+		} else if (queryParams.has('code')) {
+			level = deserializeB64(queryParams.get('code')!)
+		} else {
+			error = 'URL ungültig'
 		}
 	})
 

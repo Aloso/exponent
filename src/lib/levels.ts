@@ -14,6 +14,7 @@ export interface LevelOverlayProps {
 
 export interface Level {
 	id: string
+	encoded?: string
 	number?: number
 	name: string
 	pos: Pos

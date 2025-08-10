@@ -3,7 +3,7 @@ import { cleanSquares, type Pos } from './position'
 
 export interface Config {
 	completedLevels: CompletedLevel[]
-	currentLevel?: { id: string; pos: Pos }
+	currentLevel?: { id: string; pos: Pos; encoded?: string }
 	initialized: boolean
 }
 
@@ -40,8 +40,8 @@ export function addCompletedLevel(id: string) {
 	}
 }
 
-export function setLevelState(id: string, pos: Pos) {
-	appState.currentLevel = { id, pos: { ...pos, squares: cleanSquares(pos.squares) } }
+export function setLevelState(id: string, encoded: string | undefined, pos: Pos) {
+	appState.currentLevel = { id, encoded, pos: { ...pos, squares: cleanSquares(pos.squares) } }
 }
 
 export function resetLevelState() {
@@ -52,5 +52,12 @@ export function areAllLevelsCompleted() {
 	return (
 		appState.initialized &&
 		levels.every((lvl) => appState.completedLevels.some((completed) => completed.id === lvl.id))
+	)
+}
+
+export function isTutorialCompleted() {
+	return (
+		appState.initialized &&
+		appState.completedLevels.some((completed) => completed.id === 'tutorial-01')
 	)
 }

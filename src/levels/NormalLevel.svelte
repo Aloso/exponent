@@ -28,7 +28,13 @@
 	})
 
 	$effect(() => {
-		if (saved && pos.moveCount === 0 && saved.pos.moveCount > 2 && saved.id === level.id) {
+		if (
+			saved &&
+			pos.moveCount === 0 &&
+			saved.pos.moveCount > 2 &&
+			saved.id === level.id &&
+			saved.encoded === level.encoded
+		) {
 			console.log(`level restored (move ${saved.pos.moveCount})`)
 			field?.setPos(saved.pos, false)
 			pos = saved.pos
@@ -36,7 +42,7 @@
 	})
 
 	let levelIndex = $derived(levels.findIndex((l) => l.id === level.id))
-	let nextLevel = $derived(levels[levelIndex + 1])
+	let nextLevel = $derived(levelIndex === -1 ? undefined : levels[levelIndex + 1])
 
 	function finish() {
 		if (nextLevel) navigate(nextLevel.id)
@@ -58,7 +64,7 @@
 
 	onMount(() => {
 		const winHandler = field!.on('win', (event) => {
-			addCompletedLevel(level.id)
+			if (level.id !== 'custom') addCompletedLevel(level.id)
 			if (!level.overlay) levelResult = 'won'
 			return event
 		})
@@ -68,12 +74,12 @@
 			return event
 		})
 		const moveHandler = field!.on('move', (event) => {
-			setLevelState(level.id, event.newPos)
+			setLevelState(level.id, level.encoded, event.newPos)
 			pos = event.newPos
 			return event
 		})
 		const undoHandler = field!.on('undo', (event) => {
-			setLevelState(level.id, event.newPos)
+			setLevelState(level.id, level.encoded, event.newPos)
 			pos = event.newPos
 			return event
 		})
@@ -105,7 +111,7 @@
 		>
 			<h1>Level {level.number ?? ''} abgeschlossen</h1>
 			<p class="emoji">🎉</p>
-			{#if !nextLevel}
+			{#if !nextLevel && level.id !== 'custom'}
 				<p class="description">Du hast <em>alle Level</em> abgeschlossen!</p>
 			{/if}
 		</GameResultOverlay>

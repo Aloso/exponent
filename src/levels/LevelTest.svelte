@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
-	import { addCompletedLevel, appState, resetLevelState, setLevelState } from '$lib/appState.svelte'
+	import { appState, resetLevelState, setLevelState } from '$lib/appState.svelte'
 	import type { Level } from '$lib/levels'
 	import { onMount } from 'svelte'
 	import Field from '../components/Field.svelte'
@@ -18,12 +18,27 @@
 	let field = $state<Field>()
 	let levelResult: 'won' | 'lost' | undefined = $state()
 	let saved = $derived(appState.currentLevel)
+	let copied = $state(false)
 
 	$effect(() => {
 		level
 		queueMicrotask(() => {
 			levelResult = field?.checkGame()
 		})
+	})
+
+	$effect(() => {
+		if (
+			saved &&
+			pos.moveCount === 0 &&
+			saved.pos.moveCount > 2 &&
+			saved.id === level.id &&
+			saved.encoded === level.encoded
+		) {
+			console.log(`level restored (move ${saved.pos.moveCount})`)
+			field?.setPos(saved.pos, false)
+			pos = saved.pos
+		}
 	})
 
 	function finish() {
@@ -38,6 +53,19 @@
 		})
 	}
 
+	async function share() {
+		const url = new URL('/level', location.href)
+		url.searchParams.append('code', level.encoded!)
+		const text = url.toString()
+
+		if ('canShare' in navigator && navigator.canShare({ text })) {
+			await navigator.share({ text })
+		} else {
+			await navigator.clipboard.writeText(text)
+			copied = true
+		}
+	}
+
 	function undo() {
 		field?.undo()
 		levelResult = undefined
@@ -45,7 +73,6 @@
 
 	onMount(() => {
 		const winHandler = field!.on('win', (event) => {
-			addCompletedLevel(level.id)
 			if (!level.overlay) levelResult = 'won'
 			return event
 		})
@@ -55,12 +82,12 @@
 			return event
 		})
 		const moveHandler = field!.on('move', (event) => {
-			setLevelState(level.id, event.newPos)
+			setLevelState(level.id, level.encoded, event.newPos)
 			pos = event.newPos
 			return event
 		})
 		const undoHandler = field!.on('undo', (event) => {
-			setLevelState(level.id, event.newPos)
+			setLevelState(level.id, level.encoded, event.newPos)
 			pos = event.newPos
 			return event
 		})
@@ -74,6 +101,10 @@
 	})
 </script>
 
+<svelte:head>
+	<title>{level.name} - Exponent</title>
+</svelte:head>
+
 <LevelHeader {level} {undo} canUndo={field?.canUndo()} />
 
 <Field {level} bind:this={field} />
@@ -86,12 +117,16 @@
 	{#if levelResult === 'won'}
 		<GameResultOverlay
 			actions={[
-				{ label: 'Wiederholen', action: reset },
+				{ label: 'Teilen', action: share },
 				{ label: 'Zum Hauptmenü', action: finish },
 			]}
 		>
 			<h1>Level abgeschlossen</h1>
 			<p class="emoji">🎉</p>
+			<p>Du kannst den Level nun mit anderen teilen!</p>
+			{#if copied}
+				<p>Link wurde kopiert.</p>
+			{/if}
 		</GameResultOverlay>
 	{:else}
 		<GameResultOverlay

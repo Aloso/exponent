@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { appState } from '$lib/appState.svelte'
 	import { getNextLevel, levels } from '$lib/levels'
+	import { deserializeB64 } from '$lib/serde'
 	import Header from '../../components/Header.svelte'
 	import LevelButton from '../../components/LevelButton.svelte'
 	import MusicButton from '../../components/MusicButton.svelte'
@@ -16,6 +17,9 @@
 			const level = levels.find((l) => l.id === currentGame.id)
 			if (level !== undefined) {
 				return level
+			}
+			if (currentGame.encoded) {
+				return deserializeB64(currentGame.encoded)
 			}
 			return nextLevel
 		}

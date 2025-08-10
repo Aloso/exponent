@@ -20,6 +20,7 @@
 		rules: ['default'],
 		goal: 256,
 	})
+	let serialized = $derived(serializeB64(level))
 
 	let selected = $state<[number, number]>()
 	let fieldType = $state<FieldType>()
@@ -159,11 +160,13 @@
 		}
 	})
 
-	function makeHighlights([x, y]: [number, number]): string[][] {
+	let highlights = $derived.by(() => {
+		if (!selected) return undefined
+		const [x, y] = selected
 		const result = level.pos.squares.map((row) => row.map(() => ''))
-		result[x][y] = 'outline: 0.25rem solid white'
+		result[y][x] = 'outline: 0.25rem solid white'
 		return result
-	}
+	})
 
 	function getFieldType(square: Square): FieldType {
 		if (square.effects?.includes('black-hole')) {
@@ -172,24 +175,12 @@
 			return square.variant
 		}
 	}
-
-	function tryIt() {
-		const serialized = serializeB64(level)
-		const params = new URLSearchParams()
-		params.set('level', serialized)
-		goto(`/level-builder/test?${params}`)
-	}
 </script>
 
 <!-- TODO: Reset action -->
 <Header back>Level-Editor</Header>
 
-<Field
-	bind:this={field}
-	{level}
-	noGestures
-	highlights={selected ? makeHighlights(selected) : undefined}
-/>
+<Field bind:this={field} {level} noGestures {highlights} />
 
 {#if selected}
 	<div class="selected-editor">
@@ -292,7 +283,9 @@
 	{/if}
 </div>
 
-<button class="try-it-button" onclick={tryIt}>Ausprobieren</button>
+<a class="button try-it-button" href="/level-builder/test?level={serialized}" target="_blank">
+	Ausprobieren
+</a>
 
 <div class="hints">
 	<p><em>Hinweise:</em></p>
@@ -352,6 +345,7 @@
 		padding: 1rem;
 		background-color: #fff2;
 		box-sizing: border-box;
+		border-radius: 0.5rem;
 		width: 90%;
 		font: inherit;
 		font-size: 1.2rem;

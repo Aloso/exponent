@@ -2,7 +2,7 @@
 	import type { Level } from '$lib/levels'
 	import { onMount } from 'svelte'
 	import LevelTest from '../../../levels/LevelTest.svelte'
-	import { deserializeB64, deserializeLevel } from '$lib/serde'
+	import { deserializeB64 } from '$lib/serde'
 
 	let level = $state<Level>()
 	let error = $state<string>()

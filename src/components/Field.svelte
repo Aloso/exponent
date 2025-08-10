@@ -188,7 +188,7 @@
 					<SquareComponent
 						{square}
 						mode={level.mode}
-						highlights={highlights?.[x][y]}
+						highlights={highlights?.[y][x]}
 						onclick={() => triggerEvent('click', { action: 'click', x, y })}
 					/>
 				{/each}

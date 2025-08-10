@@ -6,11 +6,12 @@
 	import Header from '../components/Header.svelte'
 	import MusicButton from '../components/MusicButton.svelte'
 	import { shouldUpdate } from '$lib/startTime'
-	import { areAllLevelsCompleted } from '$lib/appState.svelte'
+	import { areAllLevelsCompleted, isTutorialCompleted } from '$lib/appState.svelte'
 
 	let installation = useSpaInstallation()
 	let shouldReload = $state(false)
 	let showLevelBuilder = $derived(areAllLevelsCompleted())
+	let showExtras = $derived(isTutorialCompleted())
 
 	onMount(async () => {
 		if (!shouldReload) {
@@ -35,6 +36,12 @@
 			goto('/campaign')
 		}}>Start</button
 	>
+	<a href="/extras" class="button extras-button" class:hidden={!showExtras}>Tägliche Challenge</a>
+
+	<a href="/level-builder" class="button level-builder-button" class:hidden={!showLevelBuilder}>
+		Level Builder
+	</a>
+
 	<button
 		class="install-button"
 		class:hidden={installation.installed}
@@ -47,10 +54,6 @@
 	<button class="reload-button" class:hidden={!shouldReload} onclick={() => location.reload()}>
 		Neu laden
 	</button>
-
-	<a href="/level-builder" class="button level-builder-button" class:hidden={!showLevelBuilder}>
-		Level Builder
-	</a>
 </div>
 
 <style lang="scss">
@@ -95,11 +98,16 @@
 		@include helper.focus-background(#fff2);
 	}
 
-	.start-button {
+	.start-button,
+	.extras-button {
 		background-color: #922dff50;
 		padding-block: 0.5rem;
 		font-size: 1.75rem;
 		@include helper.focus-background(#922dff70);
+	}
+
+	.extras-button {
+		font-size: 1.4rem;
 	}
 
 	.hidden {

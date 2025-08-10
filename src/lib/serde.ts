@@ -22,10 +22,10 @@ export function deserializeB64(level: string): Level {
 	const json = atob(level)
 	const serial = JSON.parse(json)
 	console.log('deserialized:', serial)
-	return deserializeLevel(serial)
+	return deserializeLevel(serial, level)
 }
 
-export function serializeLevel(level: Level): SerialLevel {
+function serializeLevel(level: Level): SerialLevel {
 	return {
 		name: level.name,
 		goal: level.goal,
@@ -110,7 +110,7 @@ function deserializeRulesAndTargetFields(level: SerialLevel, pos: Pos): [LevelRu
 	return [rules, targetFields]
 }
 
-export function deserializeLevel(level: SerialLevel, transform?: (level: Level) => Level): Level {
+function deserializeLevel(level: SerialLevel, encoded: string): Level {
 	const mode =
 		level.mode === 'default'
 			? defaultMode
@@ -120,14 +120,13 @@ export function deserializeLevel(level: SerialLevel, transform?: (level: Level) 
 	const pos = parsePosition(level.pos)
 	const [rules, targetFields] = deserializeRulesAndTargetFields(level, pos)
 
-	const output: Level = {
+	return {
 		id: 'custom',
+		encoded,
 		name: level.name,
 		pos: pos,
 		goal: targetFields > 0 ? { fields: targetFields } : level.goal,
 		mode: level.hidden ? { ...mode, hidden: true } : mode,
 		rules: rules,
 	}
-
-	return transform ? transform(output) : output
 }
