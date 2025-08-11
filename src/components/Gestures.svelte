@@ -3,6 +3,7 @@
 	import type { Snippet } from 'svelte'
 
 	interface Props {
+		withKeyboard?: boolean
 		zIndex?: number
 		onMove: (direction: Direction) => void
 		surface?: HTMLElement
@@ -10,7 +11,7 @@
 		children?: Snippet
 	}
 
-	let { zIndex, onMove, surface = $bindable(), onClick, children }: Props = $props()
+	let { withKeyboard, zIndex, onMove, surface = $bindable(), onClick, children }: Props = $props()
 	let gestureCanvas = $state<HTMLElement>()
 
 	$effect(() => {
@@ -107,7 +108,8 @@
 			gestureStart = undefined
 		}
 
-		window.addEventListener('keydown', keyDownHandler)
+		if (withKeyboard) window.addEventListener('keydown', keyDownHandler)
+
 		if ('ontouchstart' in document.documentElement) {
 			eventTarget.addEventListener('touchstart', touchStartHandler, { passive: false })
 			window.addEventListener('touchmove', touchMoveHandler, { passive: false })

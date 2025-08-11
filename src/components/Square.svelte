@@ -47,7 +47,7 @@
 
 <button class="square-bg" class:empty={square.variant === 'empty'} style={highlights} {onclick}>
 	{#if square.goal}
-		<div class="goal">{square.goal}+</div>
+		<div class="goal" class:big={square.goal >= 1000}>{square.goal}+</div>
 	{/if}
 
 	{#each oldSquares as old}
@@ -82,7 +82,9 @@
 		display: flex;
 		justify-content: center;
 		position: relative;
+		height: 0;
 		margin: 8%;
+		padding: 0 0 84% 0;
 		border-radius: 0.3rem;
 		background-color: #0002;
 		box-shadow: inset 0 0.5rem 0 0.05rem #00000008;
@@ -97,16 +99,21 @@
 	.goal {
 		box-sizing: border-box;
 		position: absolute;
-		width: 80%;
-		height: 80%;
-		margin: 10%;
+		width: 84%;
+		height: 84%;
+		margin: 8%;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
 		border-radius: 50%;
 		font-weight: 600;
+		font-size: 0.67em;
 		color: #fffa;
-		border: 0.2rem solid #fff7;
+		border: 0.15em solid #fff7;
+
+		&.big {
+			font-size: 0.55em;
+		}
 	}
 
 	.square {
@@ -117,6 +124,7 @@
 		align-items: center;
 		justify-content: center;
 		border-radius: 0.3rem;
+		pointer-events: none;
 
 		&.full {
 			background-color: var(--color, #fff3);
@@ -129,7 +137,6 @@
 				left: 0;
 				right: 0;
 				text-align: center;
-				font-size: calc(0.3 * var(--app-width) / var(--columns, 4));
 			}
 		}
 
@@ -236,28 +243,28 @@
 		}
 
 		&.d1 {
-			font-size: calc(0.3 * var(--app-width) / var(--columns, 4));
+			font-size: 1em;
 		}
 		&.d2 {
-			font-size: calc(0.26 * var(--app-width) / var(--columns, 4));
+			font-size: 0.85em;
 		}
 		&.d3 {
-			font-size: calc(0.22 * var(--app-width) / var(--columns, 4));
+			font-size: 0.73em;
 		}
 		&.d4 {
-			font-size: calc(0.2 * var(--app-width) / var(--columns, 4));
+			font-size: 0.66em;
 		}
 		&.d5 {
-			font-size: calc(0.18 * var(--app-width) / var(--columns, 4));
+			font-size: 0.6em;
 		}
 		&.d6 {
-			font-size: calc(0.16 * var(--app-width) / var(--columns, 4));
+			font-size: 0.53em;
 		}
 		&.d7 {
-			font-size: calc(0.15 * var(--app-width) / var(--columns, 4));
+			font-size: 0.5em;
 		}
 		&.d8 {
-			font-size: calc(0.14 * var(--app-width) / var(--columns, 4));
+			font-size: 0.46em;
 		}
 	}
 </style>

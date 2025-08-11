@@ -208,18 +208,15 @@
 {/if}
 
 {#if !noGestures}
-	<Gestures onMove={move} />
+	<Gestures withKeyboard onMove={move} />
 {/if}
 
 <style lang="scss">
 	.field {
-		position: relative;
-		width: auto;
 		width: 90%;
-		height: 0;
 		margin: 0 auto;
-		padding-bottom: calc(90% * var(--aspect-ratio));
 		animation: appear-from-center 0.3s ease forwards;
+		font-size: calc(0.3 * var(--app-width) / var(--columns, 4));
 
 		&.hidden-fields {
 			color: transparent !important;
@@ -238,19 +235,16 @@
 	}
 
 	.outer {
-		position: absolute;
 		box-sizing: border-box;
 		background-color: #6c016c;
 		border-radius: 1rem;
 		width: 100%;
-		height: 100%;
 		padding: 0.5rem;
 	}
 
 	.inner {
 		display: grid;
 		width: 100%;
-		height: 100%;
 		grid-template-columns: repeat(var(--columns), 1fr);
 	}
 

@@ -233,10 +233,29 @@
 	<p><em>Name des Levels:</em></p>
 	<input type="text" bind:value={level.name} maxlength="50" />
 
-	<p>
-		<em>Größe:</em>
-		<input type="number" class="small" bind:value={globalSize[0]} min="2" max="12" /> ×
-		<input type="number" class="small" bind:value={globalSize[1]} min="2" max="12" />
+	<p style="margin-bottom: 0">
+		<em>Reihen:</em>
+		<button class="plus-minus" onclick={() => globalSize[0]--} disabled={globalSize[0] === 1}>
+			–
+		</button>
+		{globalSize[0]}
+		<button
+			class="plus-minus"
+			onclick={() => globalSize[0]++}
+			disabled={globalSize[0] === 10 || globalSize[0] > globalSize[1] * 1.34}
+		>
+			+
+		</button>
+	</p>
+	<p style="margin-top: 0">
+		<em>Spalten:</em>
+		<button class="plus-minus" onclick={() => globalSize[1]--} disabled={globalSize[1] === 1}>
+			–
+		</button>
+		{globalSize[1]}
+		<button class="plus-minus" onclick={() => globalSize[1]++} disabled={globalSize[1] === 8}>
+			+
+		</button>
 	</p>
 
 	<p><em>Modus:</em></p>
@@ -336,8 +355,10 @@
 		}
 	}
 
-	input[type='number'].small {
-		width: 80px;
+	.plus-minus {
+		background-color: #0002;
+		padding: 0.15rem 0.67rem 0.25rem;
+		margin: 0.1rem;
 	}
 
 	.try-it-button {

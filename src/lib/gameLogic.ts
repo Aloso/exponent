@@ -36,6 +36,8 @@ export function gameLogic(mode: LevelMode, squares: Square[][], direction: Direc
 				} else {
 					incHead()
 				}
+			} else if (head.variant === 'mouth') {
+				incTail()
 			} else if (head.num !== undefined) {
 				if (tail.num === undefined) {
 					if (tail.variant === 'normal') {
