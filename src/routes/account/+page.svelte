@@ -52,14 +52,13 @@
 </script>
 
 <script lang="ts">
-	import { onMount } from 'svelte'
 	import Header from '../../components/Header.svelte'
 	import { goto } from '$app/navigation'
 
 	let accountInfo = $state<AccountInfo>()
 	let error = $state<string>()
 
-	onMount(async () => {
+	async function onLoad() {
 		const storedInfo = localStorage.getItem('account')
 		if (storedInfo) {
 			accountInfo = JSON.parse(storedInfo) as AccountInfo
@@ -104,11 +103,11 @@
 			text: 'Mit Google anmelden',
 			shape: 'pill',
 		})
-	})
+	}
 </script>
 
 {#if true}
-	<script src="https://accounts.google.com/gsi/client"></script>
+	<script src="https://accounts.google.com/gsi/client" onload={onLoad}></script>
 {/if}
 
 <Header back>
