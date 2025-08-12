@@ -17,7 +17,7 @@
 	{/if}
 	{level.name}
 
-	{#snippet action()}
+	{#snippet action2()}
 		<button class="header-action-button" aria-label="Rückgängig" onclick={undo} disabled={!canUndo}>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"

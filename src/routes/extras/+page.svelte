@@ -7,6 +7,7 @@
 	import LevelButton from '../../components/LevelButton.svelte'
 
 	let levels = $state<(readonly [Date, Level])[]>([])
+	let loaded = $state(false)
 
 	onMount(async () => {
 		const response = await fetch(
@@ -28,27 +29,35 @@
 		threeWeeksAgo.setDate(threeWeeksAgo.getDate() - 21)
 
 		levels = lines
-			.map((line) => {
+			.flatMap((line) => {
 				const [date, data] = line.split(',')
-				return [new Date(date), deserializeB64(data)] as const
+				try {
+					return [[new Date(date), deserializeB64(data)] as const]
+				} catch (e) {
+					console.warn(e)
+					return []
+				}
 			})
-			.filter(([date, level]) => date < today && date > threeWeeksAgo)
+			.filter(([date]) => date < today && date > threeWeeksAgo)
 			.sort(([d1], [d2]) => +d2 - +d1)
+		loaded = true
 	})
 </script>
 
 <Header back>
 	Tägliche Challenge
-	{#snippet action()}
+	{#snippet action2()}
 		<MusicButton />
 	{/snippet}
 </Header>
 
 <div class="levels">
-	{#each levels as [date, level], i}
+	{#each levels as [date, level]}
 		<LevelButton {level} {date} />
 	{:else}
-		<p class="centered">Im Moment sind keine täglichen Herausforderungen verfügbar! Schere</p>
+		{#if loaded}
+			<p class="centered">Im Moment sind keine täglichen Herausforderungen verfügbar! Schere</p>
+		{/if}
 	{/each}
 </div>
 

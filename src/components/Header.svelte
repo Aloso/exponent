@@ -7,15 +7,16 @@
 	interface Props {
 		back?: boolean
 		children?: Snippet
-		action?: Snippet
+		action1?: Snippet
+		action2?: Snippet
 	}
 
-	let { back, children, action }: Props = $props()
+	let { back, children, action1, action2 }: Props = $props()
 </script>
 
 <div class="header">
-	{#if back}
-		<div>
+	<div class="left">
+		{#if back}
 			<button
 				class="back-button"
 				onclick={() => {
@@ -39,10 +40,11 @@
 					<path d="M15,8 L1,8 L6,2 L1,8 L6,14 L1,8" />
 				</svg>
 			</button>
-		</div>
-	{:else}
-		<div></div>
-	{/if}
+		{/if}
+		{#if action1}
+			{@render action1()}
+		{/if}
+	</div>
 
 	<h1>
 		{#if children}
@@ -51,8 +53,8 @@
 	</h1>
 
 	<div class="right">
-		{#if action}
-			{@render action()}
+		{#if action2}
+			{@render action2()}
 		{/if}
 	</div>
 </div>
@@ -79,6 +81,11 @@
 			height: 1.25rem;
 			display: block;
 		}
+	}
+
+	.left {
+		display: flex;
+		justify-content: start;
 	}
 
 	.right {

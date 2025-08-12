@@ -28,7 +28,7 @@
 
 <Header back>
 	Übersicht
-	{#snippet action()}
+	{#snippet action2()}
 		<MusicButton />
 	{/snippet}
 </Header>
