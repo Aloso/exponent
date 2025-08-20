@@ -1,6 +1,8 @@
 import { error } from '@sveltejs/kit'
 import type { User } from '../api/types.js'
-import { parse as parseCookie } from 'cookie'
+import { parse as parseCookies } from 'cookie'
+
+export const prerender = false
 
 export interface Data {
 	user?: Omit<User, 'google_id'>
@@ -12,7 +14,7 @@ export async function load({ request, platform }): Promise<Data> {
 	const cookie = request.headers.get('cookie')
 	if (!cookie) return {}
 
-	const { SID } = parseCookie(cookie)
+	const { SID } = parseCookies(cookie)
 	if (!SID) return {}
 
 	try {

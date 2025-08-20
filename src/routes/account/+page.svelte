@@ -1,114 +1,18 @@
-<script module>
-	declare const google: {
-		accounts: {
-			id: {
-				initialize: (config: InitializeConfig) => void
-				renderButton: (elem: HTMLElement, options: GsiButtonConfiguration) => void
-			}
-		}
-	}
-
-	interface InitializeConfig {
-		client_id: string
-		login_uri?: string
-		callback?: (creds: Credentials) => void
-	}
-
-	interface Credentials {
-		credential: string
-		client_id: string
-	}
-
-	interface CredentialsContent {
-		aud: string
-		azp: string
-		email: string
-		exp: number
-		family_name: string
-		given_name: string
-		iat: number
-		iss: string
-		jti: string
-		name: string
-		nbf: string
-		picture: string
-		sub: string
-	}
-
-	interface GsiButtonConfiguration {
-		type: string
-		theme?: string
-		size?: string
-		text?: string
-		shape?: string
-		logo_alignment?: string
-		width?: number
-		locale?: string
-		click_listener?: () => void
-	}
-
-	interface AccountInfo {
-		status: 'loggedIn' | 'remembered'
-		exp?: number
-		provider: 'google'
-		name: string
-		givenName: string
-		email: string
-	}
-</script>
-
 <script lang="ts">
 	import Header from '../../components/Header.svelte'
 	import { goto } from '$app/navigation'
 	import type { Data } from './+page.server'
+	import { dev } from '$app/environment'
 
 	interface Props {
 		data: Data
 	}
 
 	let { data }: Props = $props()
-
-	async function onLoad() {
-		if (data.user) {
-			return
-		}
-
-		google.accounts.id.initialize({
-			client_id: '13487924400-e61ocnpl0l07bb8udao0p2a0n2tg7bdk.apps.googleusercontent.com',
-			login_uri: 'http://localhost:5173/api/login',
-			// callback({ credential }) {
-			// 	try {
-			// 		const info: CredentialsContent = JSON.parse(atob(credential.split('.')[1]))
-			// 		accountInfo = {
-			// 			status: 'remembered',
-			// 			exp: info.exp,
-			// 			provider: 'google',
-			// 			name: info.name,
-			// 			givenName: info.given_name,
-			// 			email: info.email,
-			// 		}
-			// 		localStorage.setItem('account', JSON.stringify(accountInfo))
-			// 		accountInfo.status = 'loggedIn'
-			// 	} catch {
-			// 		error = 'Bei der Anmeldung ist ein Fehler aufgetreten.'
-			// 	}
-			//
-			// 	// TODO: Authentication request to set cookie
-			// },
-		})
-
-		google.accounts.id.renderButton(document.getElementById('login-button')!, {
-			type: 'standard',
-			theme: 'outline',
-			size: 'large',
-			text: 'Mit Google anmelden',
-			shape: 'pill',
-		})
-	}
 </script>
 
 {#if true}
-	<script src="https://accounts.google.com/gsi/client" onload={onLoad}></script>
+	<script src="https://accounts.google.com/gsi/client"></script>
 {/if}
 
 <Header back>
@@ -140,7 +44,22 @@
 	</div>
 {:else}
 	<div class="login-wrapper">
-		<div id="login-button"></div>
+		<div
+			id="g_id_onload"
+			data-client_id="13487924400-e61ocnpl0l07bb8udao0p2a0n2tg7bdk.apps.googleusercontent.com"
+			data-login_uri={dev
+				? 'http://localhost:5173/api/login'
+				: 'https://exponent.aloso.foo/api/login'}
+			data-auto_prompt="false"
+		></div>
+		<div
+			class="g_id_signin"
+			data-type="standard"
+			data-size="large"
+			data-theme="outline"
+			data-text="sign_in_with"
+			data-shape="pill"
+		></div>
 	</div>
 {/if}
 

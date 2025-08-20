@@ -28,10 +28,10 @@ export async function POST({ request, platform }): Promise<Response> {
 	if (!jwt || typeof jwt === 'object') error(400, 'No credential in post body.')
 
 	const payload = await verifyJwt(jwt)
-	console.log(payload.email, payload.given_name, payload.name, payload.sub)
 
 	const user = await insertUser(platform.env.DB, payload)
-	const sessionId = await createSession(platform.env.DB, user.user_id)
+	const sessionId = crypto.randomUUID()
+	await createSession(platform.env.DB, sessionId, user.user_id)
 	const setCookie = serializeCookie('SID', sessionId, {
 		httpOnly: true,
 		path: '/',
@@ -93,11 +93,11 @@ async function insertUser(
 	}
 }
 
-async function createSession(db: D1Database, userId: number) {
+async function createSession(db: D1Database, sessionId: string, userId: number) {
 	try {
 		const session = await db
-			.prepare('INSERT INTO active_sessions (session_id, user_id) VALUES (uuid(), ?) RETURNING *;')
-			.bind(userId)
+			.prepare('INSERT INTO active_sessions (session_id, user_id) VALUES (?, ?) RETURNING *;')
+			.bind(sessionId, userId)
 			.first()
 		return (session as unknown as ActiveSession).session_id
 	} catch (err) {
