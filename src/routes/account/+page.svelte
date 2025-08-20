@@ -2,10 +2,16 @@
 	declare const google: {
 		accounts: {
 			id: {
-				initialize: (config: { client_id: string; callback?: (creds: Credentials) => void }) => void
+				initialize: (config: InitializeConfig) => void
 				renderButton: (elem: HTMLElement, options: GsiButtonConfiguration) => void
 			}
 		}
+	}
+
+	interface InitializeConfig {
+		client_id: string
+		login_uri?: string
+		callback?: (creds: Credentials) => void
 	}
 
 	interface Credentials {
@@ -54,46 +60,41 @@
 <script lang="ts">
 	import Header from '../../components/Header.svelte'
 	import { goto } from '$app/navigation'
+	import type { Data } from './+page.server'
 
-	let accountInfo = $state<AccountInfo>()
-	let error = $state<string>()
+	interface Props {
+		data: Data
+	}
+
+	let { data }: Props = $props()
 
 	async function onLoad() {
-		const storedInfo = localStorage.getItem('account')
-		if (storedInfo) {
-			accountInfo = JSON.parse(storedInfo) as AccountInfo
-			if (accountInfo.exp) {
-				const exp = new Date(accountInfo.exp * 1000)
-				if (+exp > Date.now()) {
-					return
-				} else {
-					accountInfo = undefined
-					localStorage.removeItem('account')
-				}
-			}
+		if (data.user) {
+			return
 		}
 
 		google.accounts.id.initialize({
 			client_id: '13487924400-e61ocnpl0l07bb8udao0p2a0n2tg7bdk.apps.googleusercontent.com',
-			callback({ credential }) {
-				try {
-					const info: CredentialsContent = JSON.parse(atob(credential.split('.')[1]))
-					accountInfo = {
-						status: 'remembered',
-						exp: info.exp,
-						provider: 'google',
-						name: info.name,
-						givenName: info.given_name,
-						email: info.email,
-					}
-					localStorage.setItem('account', JSON.stringify(accountInfo))
-					accountInfo.status = 'loggedIn'
-				} catch {
-					error = 'Bei der Anmeldung ist ein Fehler aufgetreten.'
-				}
-
-				// TODO: Authentication request to set cookie
-			},
+			login_uri: 'http://localhost:5173/api/login',
+			// callback({ credential }) {
+			// 	try {
+			// 		const info: CredentialsContent = JSON.parse(atob(credential.split('.')[1]))
+			// 		accountInfo = {
+			// 			status: 'remembered',
+			// 			exp: info.exp,
+			// 			provider: 'google',
+			// 			name: info.name,
+			// 			givenName: info.given_name,
+			// 			email: info.email,
+			// 		}
+			// 		localStorage.setItem('account', JSON.stringify(accountInfo))
+			// 		accountInfo.status = 'loggedIn'
+			// 	} catch {
+			// 		error = 'Bei der Anmeldung ist ein Fehler aufgetreten.'
+			// 	}
+			//
+			// 	// TODO: Authentication request to set cookie
+			// },
 		})
 
 		google.accounts.id.renderButton(document.getElementById('login-button')!, {
@@ -113,14 +114,12 @@
 <Header back>
 	Account
 	{#snippet action2()}
-		{#if accountInfo}
+		{#if data.user}
 			<button
 				class="logout-button"
 				onclick={() => {
 					localStorage.removeItem('account')
-					accountInfo = undefined
-					// TODO: Backend request to remove cookie
-					goto('/')
+					goto('/api/logout')
 				}}
 			>
 				Ausloggen
@@ -129,11 +128,9 @@
 	{/snippet}
 </Header>
 
-{#if error}
-	<p>{error}</p>
-{:else if accountInfo}
+{#if data.user}
 	<div class="content">
-		<h2>Willkommen, {accountInfo.givenName}.</h2>
+		<h2>Willkommen, {data.user.given_name}.</h2>
 		<p>Mit deinem Account kannst du bald eigene Level erstellen und veröffentlichen.</p>
 		<p>
 			<a class="button level-builder-button" href="/level-builder">Zum Level-Builder</a>
