@@ -2,12 +2,9 @@ import type { D1Database } from '@cloudflare/workers-types'
 import { error } from '@sveltejs/kit'
 
 import { parse as parseCookies, serialize as serializeCookie } from 'cookie'
-import { jwtVerify, type JWK, type JWTPayload } from 'jose'
-import type { ActiveSession, User } from '../types.js'
-
-interface GoogleJwks {
-	keys: JWK[]
-}
+import { jwtVerify, createRemoteJWKSet, type JWTPayload } from 'jose'
+import type { ActiveSession, User } from '../../../lib/api/types.js'
+import { JOSEError } from 'jose/errors'
 
 interface Payload extends JWTPayload {
 	name: string
@@ -29,13 +26,18 @@ export async function POST({ request, platform }): Promise<Response> {
 
 	const payload = await verifyJwt(jwt)
 
-	const user = await insertUser(platform.env.DB, payload)
+	if (!payload.email_verified) {
+		return new Response('Fehler: Ihr Google-Account ist noch nicht verifiziert.', { status: 403 })
+	}
+
+	const user = await getOrInsertUser(platform.env.DB, payload)
 	const sessionId = crypto.randomUUID()
 	await createSession(platform.env.DB, sessionId, user.user_id)
 	const setCookie = serializeCookie('SID', sessionId, {
 		httpOnly: true,
 		path: '/',
 		sameSite: 'strict',
+		maxAge: 2_592_000, // 30 days
 	})
 
 	return new Response('Sie werden weitergeleitet...', {
@@ -61,31 +63,42 @@ async function verifyCsrf(request: Request, body: FormData) {
 }
 
 async function verifyJwt(jwt: string) {
-	const jwk: GoogleJwks = await (await fetch('https://www.googleapis.com/oauth2/v3/certs')).json()
-
 	try {
-		const result = await jwtVerify<Payload>(jwt, jwk.keys[0], {
+		const JWKS = createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'))
+
+		const result = await jwtVerify<Payload>(jwt, JWKS, {
 			issuer: 'https://accounts.google.com',
 			audience: '13487924400-e61ocnpl0l07bb8udao0p2a0n2tg7bdk.apps.googleusercontent.com',
 		})
 		return result.payload
 	} catch (err) {
 		console.log(err)
-		error(401, JSON.stringify(err))
+		error(401, err instanceof JOSEError ? err.message : JSON.stringify(err))
 	}
 }
 
-async function insertUser(
+async function getOrInsertUser(
 	db: D1Database,
 	{ name, given_name, family_name, picture, email, sub }: Payload,
 ) {
 	try {
-		const user = await db
-			.prepare(
-				'INSERT OR REPLACE INTO users (name, given_name, family_name, picture, email, google_id) VALUES (?, ?, ?, ?, ?, ?) RETURNING *;',
-			)
-			.bind(name, given_name, family_name, picture, email, sub)
-			.first()
+		let user = await db.prepare('SELECT * FROM users WHERE google_id = ?;').bind(sub).first()
+		if (!user) {
+			user = await db
+				.prepare(
+					'INSERT INTO users (name, display_name, family_name, picture, email, google_id) VALUES (?, ?, ?, ?, ?, ?) RETURNING *;',
+				)
+				.bind(
+					name,
+					given_name ?? name ?? `User ${sub}`,
+					family_name ?? null,
+					picture ?? null,
+					email,
+					sub,
+				)
+				.first()
+		}
+
 		return user as unknown as User
 	} catch (err) {
 		console.error(err)

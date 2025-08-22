@@ -26,8 +26,36 @@ button,
 	text-align: center;
 }
 
+input[type='number'],
+input[type='text'] {
+	background-color: #0002;
+	border: none;
+	font: inherit;
+	color: inherit;
+	padding: 0.2rem 0.6rem;
+	border-radius: 0.2rem;
+	width: 100%;
+	box-sizing: border-box;
+
+	&:hover,
+	&:focus {
+		outline: none;
+		background-color: #0004;
+	}
+}
+
 em {
 	font-style: normal;
 	font-weight: 500;
 	color: #ffff0c;
+}
+
+a {
+	color: #b6e9ff;
+	font-weight: 500;
+	text-underline-offset: 5px;
+}
+
+li {
+	margin: 1em 0;
 }

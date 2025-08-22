@@ -337,24 +337,6 @@
 		margin-bottom: 0;
 	}
 
-	input[type='number'],
-	input[type='text'] {
-		background-color: #0002;
-		border: none;
-		font: inherit;
-		color: inherit;
-		padding: 0.2rem 0.6rem;
-		border-radius: 0.2rem;
-		width: 100%;
-		box-sizing: border-box;
-
-		&:hover,
-		&:focus {
-			outline: none;
-			background-color: #0004;
-		}
-	}
-
 	.plus-minus {
 		background-color: #0002;
 		padding: 0.15rem 0.67rem 0.25rem;

@@ -34,6 +34,6 @@ async function deleteSession(db: D1Database, sessionId: string) {
 		await db.prepare('DELETE FROM active_sessions WHERE session_id = ?;').bind(sessionId).run()
 	} catch (err) {
 		console.error(err)
-		error(500, 'An error occurred while creating a session')
+		error(500, 'An error occurred while deleting a session')
 	}
 }

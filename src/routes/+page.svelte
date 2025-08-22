@@ -49,10 +49,6 @@
 	>
 	<a href="/extras" class="button extras-button" class:hidden={!showExtras}>Tägliche Challenge</a>
 
-	<a href="/level-builder" class="button level-builder-button" class:hidden={!showLevelBuilder}>
-		Level Builder
-	</a>
-
 	<button
 		class="install-button"
 		class:hidden={installation.installed}
@@ -102,8 +98,7 @@
 	}
 
 	.install-button,
-	.reload-button,
-	.level-builder-button {
+	.reload-button {
 		background-color: #fff1;
 		padding-block: 0.5rem;
 		@include helper.focus-background(#fff2);

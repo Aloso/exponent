@@ -3,12 +3,22 @@
 	import { goto } from '$app/navigation'
 	import type { Data } from './+page.server'
 	import { dev } from '$app/environment'
+	import EditProfile from '../../components/EditProfile.svelte'
 
 	interface Props {
 		data: Data
 	}
 
 	let { data }: Props = $props()
+
+	let user = $state(data.user)
+
+	async function closeNotice() {
+		await fetch('/api/user/notice', { method: 'POST' })
+		if (user) user.notice = undefined
+	}
+
+	let editingProfile = $state(false)
 </script>
 
 {#if true}
@@ -20,7 +30,7 @@
 	{#snippet action2()}
 		{#if data.user}
 			<button
-				class="logout-button"
+				class="button action-button"
 				onclick={() => {
 					localStorage.removeItem('account')
 					goto('/api/logout')
@@ -32,15 +42,36 @@
 	{/snippet}
 </Header>
 
-{#if data.user}
+{#if user}
 	<div class="content">
-		<h2>Willkommen, {data.user.given_name}.</h2>
+		<h2>Willkommen, {user.display_name}.</h2>
 		<p>Mit deinem Account kannst du bald eigene Level erstellen und veröffentlichen.</p>
+		{#if user.notice}
+			<div class="notice">
+				{user.notice}
+				<br />
+				<br />
+				<button class="button action-button" onclick={closeNotice}>Verstanden</button>
+			</div>
+		{/if}
 		<p>
-			<a class="button level-builder-button" href="/level-builder">Zum Level-Builder</a>
+			<button class="button action-button" onclick={() => (editingProfile = true)}>
+				Profil bearbeiten
+			</button>
+			{#if !editingProfile}
+				<a class="button action-button" href="/account/code-of-conduct">Verhaltens-Richtlinien</a>
+			{/if}
 		</p>
+
+		{#if editingProfile}
+			<EditProfile bind:user onclose={() => (editingProfile = false)} />
+		{/if}
+
 		<h3>Von dir veröffentlichte Level</h3>
 		<p>Diese Funktion ist noch in Konstruktion 🚧</p>
+		<p>
+			<a class="button action-button" href="/level-builder">Level erstellen</a>
+		</p>
 	</div>
 {:else}
 	<div class="login-wrapper">
@@ -82,8 +113,14 @@
 		}
 	}
 
-	.logout-button,
-	.level-builder-button {
+	.notice {
+		background-color: #ffcb2d70;
+		border-radius: 0.5rem;
+		padding: 1rem;
+		font-size: 0.95em;
+	}
+
+	.action-button {
 		background-color: #fff2;
 		padding-block: 0.4rem;
 		font-size: 0.9rem;
