@@ -11,7 +11,7 @@ export async function POST({ request, platform }): Promise<Response> {
 	const { searchParams } = new URL(request.url)
 	user.notice = searchParams.get('notice') ?? undefined
 
-	saveUser(user, platform.env.DB)
+	await saveUser(user, platform.env.DB)
 
 	return new Response()
 }

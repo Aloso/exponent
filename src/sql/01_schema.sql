@@ -1,6 +1,7 @@
 drop table if exists level_votes;
 drop table if exists levels;
 drop table if exists active_sessions;
+drop table if exists user_reports;
 drop table if exists users;
 
 create table users (

@@ -21,10 +21,11 @@
 	interface Props {
 		level: Level
 		noGestures?: boolean
+		noGoal?: boolean
 		highlights?: string[][]
 	}
 
-	let { level, noGestures, highlights }: Props = $props()
+	let { level, noGestures, noGoal, highlights }: Props = $props()
 
 	let pos = $state(level.pos)
 	let lastPos = $state(level.pos)
@@ -197,13 +198,15 @@
 	</div>
 </div>
 
-{#if typeof goal === 'number'}
-	<div class="goal">Erreiche die Zahl <em>{goal}</em>.</div>
-{:else if goal}
-	{#if goal.fields > 1}
-		<div class="goal">Fülle die <em>Zielfelder</em> mit der erwarteten Zahl.</div>
-	{:else}
-		<div class="goal">Fülle das <em>Zielfeld</em> mit der erwarteten Zahl.</div>
+{#if !noGoal}
+	{#if typeof goal === 'number'}
+		<div class="goal">Erreiche die Zahl <em>{goal}</em>.</div>
+	{:else if goal}
+		{#if goal.fields > 1}
+			<div class="goal">Fülle die <em>Zielfelder</em> mit der erwarteten Zahl.</div>
+		{:else}
+			<div class="goal">Fülle das <em>Zielfeld</em> mit der erwarteten Zahl.</div>
+		{/if}
 	{/if}
 {/if}
 

@@ -36,3 +36,13 @@ export function printSquare(square: Square): string {
 		return (Math.round(square.num / 1000) + 'K').padStart(3)
 	}
 }
+
+export function squareLabel(num?: number): string {
+	if (num === undefined) return ''
+	if (num > 16_000) {
+		const kilos = (num / 1000) | 0
+		return kilos + 'K'
+	} else {
+		return `${num}`
+	}
+}

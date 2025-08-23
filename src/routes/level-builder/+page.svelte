@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation'
 	import type { Direction } from '$lib/events'
 	import type { Level } from '$lib/levels'
 	import { defaultMode, fibMode, logarithmicMode } from '$lib/modes'
@@ -8,6 +7,7 @@
 	import type { Square } from '$lib/square'
 	import Field from '../../components/Field.svelte'
 	import Header from '../../components/Header.svelte'
+	import SquareComponent from '../../components/Square.svelte'
 
 	type FieldType = 'normal' | 'empty' | 'wall' | 'mouth' | 'black-hole'
 
@@ -15,7 +15,7 @@
 	let level = $state<Level>({
 		id: 'custom',
 		mode: defaultMode,
-		name: 'Unbenannt',
+		name: '',
 		pos: parsePosition(`n`),
 		rules: ['default'],
 		goal: 256,
@@ -24,12 +24,40 @@
 
 	let selected = $state<[number, number]>()
 	let fieldType = $state<FieldType>()
-	let fieldDirection = $state<Direction>('up')
+	let fieldDirection = $state<Direction>('left')
 	let fieldNumber = $state<number>()
 	let fieldTarget = $state<number>()
 
 	let globalMode = $state<'default' | 'logarithmic' | 'fibonacchi'>('default')
 	let globalSize = $state([4, 4])
+
+	let problems = $derived.by(() => {
+		let problems: string[] = []
+
+		let goals = 0
+		let numbers = 0
+
+		let { squares } = level.pos
+		for (const field of squares.flat()) {
+			if (field.goal !== undefined) goals += 1
+			if (field.num !== undefined) numbers += 1
+		}
+
+		if (numbers === 0) {
+			problems.push('Auf dem Spielfeld muss zu Beginn mindestens eine Zahl sein')
+		}
+		if (typeof level.goal !== 'number' && goals === 0) {
+			problems.push('Wenn kein Ziel gesetzt ist, muss mindestens ein Zielfeld vorhanden sein')
+		}
+		if (level.name === '') {
+			problems.push('Der Level benötigt einen Namen')
+		}
+		if (globalSize[0] > globalSize[1] * 1.5) {
+			problems.push('Das Spielfeld ist zu hoch, um auf gewöhnliche Handy-Bildschirme zu passen')
+		}
+
+		return problems
+	})
 
 	$effect(() => {
 		const mode =
@@ -180,74 +208,18 @@
 <!-- TODO: Reset action -->
 <Header back>Level-Editor</Header>
 
-<Field bind:this={field} {level} noGestures {highlights} />
-
-{#if selected}
-	<div class="selected-editor">
-		<p><em>Feld:</em></p>
-		<label><input type="radio" value="normal" bind:group={fieldType} /> Normal</label>
-		<label><input type="radio" value="empty" bind:group={fieldType} /> Leer</label>
-		<label><input type="radio" value="wall" bind:group={fieldType} /> Blockade</label>
-		<label><input type="radio" value="mouth" bind:group={fieldType} /> Mund</label>
-		<label><input type="radio" value="black-hole" bind:group={fieldType} /> Schwarzes Loch</label>
-
-		{#if fieldType === 'mouth'}
-			<p><em>Richtung:</em></p>
-			<label><input type="radio" value="left" bind:group={fieldDirection} /> Rechts</label>
-			<label><input type="radio" value="right" bind:group={fieldDirection} /> Links</label>
-			<label><input type="radio" value="up" bind:group={fieldDirection} /> Unten</label>
-			<label><input type="radio" value="down" bind:group={fieldDirection} /> Oben</label>
-		{/if}
-
-		<p>
-			<label>
-				<input
-					type="checkbox"
-					checked={fieldNumber !== undefined}
-					onchange={(e) => (fieldNumber = e.currentTarget.checked ? 2 : undefined)}
-				/>
-				<em>Enthält Zahl zu Beginn</em>
-			</label>
-		</p>
-		{#if fieldNumber !== undefined}
-			<input type="number" bind:value={fieldNumber} />
-		{/if}
-
-		<p>
-			<label>
-				<input
-					type="checkbox"
-					checked={fieldTarget !== undefined}
-					onchange={(e) => (fieldTarget = e.currentTarget.checked ? 64 : undefined)}
-				/>
-				<em>Zielfeld</em>
-			</label>
-		</p>
-		{#if fieldTarget !== undefined}
-			<input type="number" bind:value={fieldTarget} />
-		{/if}
-	</div>
-{/if}
-
-<div class="global-editor">
-	<p><em>Name des Levels:</em></p>
-	<input type="text" bind:value={level.name} maxlength="50" />
-
-	<p style="margin-bottom: 0">
+<div class="rows-columns-editor">
+	<div>
 		<em>Reihen:</em>
 		<button class="plus-minus" onclick={() => globalSize[0]--} disabled={globalSize[0] === 1}>
 			–
 		</button>
 		{globalSize[0]}
-		<button
-			class="plus-minus"
-			onclick={() => globalSize[0]++}
-			disabled={globalSize[0] === 10 || globalSize[0] > globalSize[1] * 1.34}
-		>
+		<button class="plus-minus" onclick={() => globalSize[0]++} disabled={globalSize[0] === 10}>
 			+
 		</button>
-	</p>
-	<p style="margin-top: 0">
+	</div>
+	<div>
 		<em>Spalten:</em>
 		<button class="plus-minus" onclick={() => globalSize[1]--} disabled={globalSize[1] === 1}>
 			–
@@ -256,7 +228,94 @@
 		<button class="plus-minus" onclick={() => globalSize[1]++} disabled={globalSize[1] === 8}>
 			+
 		</button>
-	</p>
+	</div>
+</div>
+
+<Field bind:this={field} {level} noGestures noGoal {highlights} />
+
+{#if selected}
+	<div class="selected-editor section">
+		<div class="minisquare-wrapper">
+			<SquareComponent
+				mode={level.mode}
+				square={{ id: 0, variant: 'normal' }}
+				highlights={fieldType === 'normal' ? 'outline: white solid 0.2rem' : undefined}
+				onclick={() => (fieldType = 'normal')}
+			/>
+			<SquareComponent
+				mode={level.mode}
+				square={{ id: 0, variant: 'empty' }}
+				highlights={fieldType === 'empty'
+					? 'outline: white solid 0.2rem'
+					: 'outline: #fff2 solid 0.1rem'}
+				onclick={() => (fieldType = 'empty')}
+			/>
+			<SquareComponent
+				mode={level.mode}
+				square={{ id: 0, variant: 'mouth', direction: 'left' }}
+				highlights={fieldType === 'mouth' ? 'outline: white solid 0.2rem' : undefined}
+				onclick={() => (fieldType = 'mouth')}
+			/>
+			<SquareComponent
+				mode={level.mode}
+				square={{ id: 0, variant: 'normal', effects: ['black-hole'] }}
+				highlights={fieldType === 'black-hole' ? 'outline: white solid 0.2rem' : undefined}
+				onclick={() => (fieldType = 'black-hole')}
+			/>
+			<SquareComponent
+				mode={level.mode}
+				square={{ id: 0, variant: 'wall' }}
+				highlights={fieldType === 'wall' ? 'outline: white solid 0.2rem' : undefined}
+				onclick={() => (fieldType = 'wall')}
+			/>
+		</div>
+
+		{#if fieldType === 'mouth'}
+			<div class="directions">
+				<label><input type="radio" value="left" bind:group={fieldDirection} /> Rechts</label>
+				<label><input type="radio" value="right" bind:group={fieldDirection} /> Links</label>
+				<label><input type="radio" value="up" bind:group={fieldDirection} /> Unten</label>
+				<label><input type="radio" value="down" bind:group={fieldDirection} /> Oben</label>
+			</div>
+		{/if}
+
+		{#if fieldType === 'normal'}
+			<div class="right-aligned-inputs">
+				<label>
+					<input
+						type="checkbox"
+						checked={fieldNumber !== undefined}
+						onchange={(e) => (fieldNumber = e.currentTarget.checked ? 2 : undefined)}
+					/>
+					<em>Zahl zu Beginn</em>
+					{#if fieldNumber !== undefined}
+						<input class="small-number" type="number" bind:value={fieldNumber} />
+					{:else}
+						<input class="small-number" type="number" disabled />
+					{/if}
+				</label>
+
+				<label>
+					<input
+						type="checkbox"
+						checked={fieldTarget !== undefined}
+						onchange={(e) => (fieldTarget = e.currentTarget.checked ? 64 : undefined)}
+					/>
+					<em>Zielfeld</em>
+					{#if fieldTarget !== undefined}
+						<input class="small-number" type="number" bind:value={fieldTarget} />
+					{:else}
+						<input class="small-number" type="number" disabled />
+					{/if}
+				</label>
+			</div>
+		{/if}
+	</div>
+{/if}
+
+<div class="global-editor section">
+	<p><em>Name des Levels:</em></p>
+	<input type="text" bind:value={level.name} maxlength="50" />
 
 	<p><em>Modus:</em></p>
 	<label><input type="radio" value="default" bind:group={globalMode} /> Normal</label>
@@ -270,59 +329,71 @@
 		</label>
 	</p>
 
-	<p>
-		<em>Ziel:</em>
-	</p>
-	<label>
-		<input
-			type="radio"
-			group="global-goal"
-			checked={typeof level.goal === 'number'}
-			onchange={() => (level.goal = 256)}
-		/> Wert wählen
-	</label>
-	<label>
-		<input
-			type="radio"
-			group="global-goal"
-			checked={typeof level.goal === 'object'}
-			onchange={() => (level.goal = { fields: 2 })}
-		/> Zielfelder
-	</label>
-	<label>
-		<input
-			type="radio"
-			group="global-goal"
-			checked={level.goal === undefined}
-			onchange={() => (level.goal = undefined)}
-		/> Keins
-	</label>
-	{#if typeof level.goal === 'number'}
-		<input type="number" bind:value={level.goal} />
-	{/if}
+	<div class="right-aligned-inputs">
+		<label>
+			<input
+				type="checkbox"
+				checked={typeof level.goal === 'number'}
+				onchange={(e) => {
+					level.goal = e.currentTarget.checked ? 256 : { fields: 2 }
+				}}
+			/>
+			<em>Ziel</em>
+			{#if typeof level.goal === 'number'}
+				<input class="small-number" type="number" bind:value={level.goal} />
+			{:else}
+				<input class="small-number" type="number" disabled />
+			{/if}
+		</label>
+	</div>
 </div>
 
-<a class="button try-it-button" href="/level-builder/test?level={serialized}" target="_blank">
+<a
+	class="button try-it-button"
+	class:disabled={problems.length > 0}
+	href="/level-builder/test?level={serialized}"
+	target="_blank"
+>
 	Ausprobieren
 </a>
 
-<div class="hints">
-	<p><em>Hinweise:</em></p>
-	<ul>
-		<li>Zu Beginn muss mindestens eine Zahl im Spielfeld sein.</li>
-		<li>Der Level muss <em>lösbar</em> sein.</li>
-		<li>Wenn <em>Zielfelder</em> als Ziel gewählt ist, muss mindestens 1 Zielfeld existieren.</li>
-	</ul>
-</div>
+{#if problems.length > 0}
+	<div class="problems section">
+		Probleme
+		<ul>
+			{#each problems as problem}
+				<li>{problem}</li>
+			{/each}
+		</ul>
+	</div>
+{/if}
 
 <style lang="scss">
-	.selected-editor,
-	.global-editor,
-	.hints {
+	.rows-columns-editor {
+		margin: 1rem auto;
+		width: 90%;
+		display: flex;
+
+		> div {
+			flex-grow: 1;
+			text-align: center;
+		}
+	}
+
+	.minisquare-wrapper {
+		position: relative;
+		display: grid;
+		width: 90%;
+		margin: 1rem auto;
+		grid-template-columns: repeat(5, 1fr);
+	}
+
+	.section {
+		position: relative;
 		box-sizing: border-box;
 		background-color: #6c016c;
-		padding: 0 1rem 1rem 1rem;
-		margin: 1.5rem auto;
+		padding: 1px 1rem;
+		margin: 1.5rem auto 0 auto;
 		width: 90%;
 		border-radius: 0.5rem;
 
@@ -333,8 +404,49 @@
 		}
 	}
 
-	.selected-editor {
-		margin-bottom: 0;
+	.selected-editor::before {
+		content: '';
+		position: absolute;
+		width: 0;
+		height: 0;
+		border: 1rem solid white;
+		border-color: transparent transparent #6c016c transparent;
+		left: 50%;
+		top: 0;
+		border-top-width: 0;
+		margin: -1rem;
+	}
+
+	input[type='number'],
+	input[type='text'] {
+		padding-block: 0.5rem;
+	}
+
+	.right-aligned-inputs {
+		margin: 1em 0;
+
+		label {
+			display: flex;
+			margin: 0;
+			align-items: center;
+
+			input[type='checkbox'] {
+				margin-right: 0.5rem;
+			}
+
+			em {
+				flex-grow: 1;
+			}
+
+			input[type='number'] {
+				width: 10em;
+			}
+		}
+	}
+
+	.directions {
+		margin: 1rem 0;
+		text-align: center;
 	}
 
 	.plus-minus {
@@ -357,9 +469,15 @@
 		&:focus {
 			background-color: #fff3;
 		}
+
+		&.disabled {
+			opacity: 0.5;
+			pointer-events: none;
+		}
 	}
 
-	.hints {
-		padding-bottom: 0;
+	.problems {
+		margin-block: 0 2rem;
+		padding: 1rem 1rem 0 1rem;
 	}
 </style>

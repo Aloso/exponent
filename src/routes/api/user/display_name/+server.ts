@@ -11,7 +11,7 @@ export async function POST({ request, platform }): Promise<Response> {
 	const { searchParams } = new URL(request.url)
 	user.display_name = searchParams.get('name') ?? user.display_name
 
-	saveUser(user, platform.env.DB)
+	await saveUser(user, platform.env.DB)
 
 	return new Response()
 }

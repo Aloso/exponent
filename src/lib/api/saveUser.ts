@@ -5,8 +5,8 @@ import { error } from '@sveltejs/kit'
 export async function saveUser(user: SafeUser, db: D1Database): Promise<void> {
 	try {
 		await db
-			.prepare('UPDATE users SET display_name = ?, email = ?, notice = ? WHERE user_id = ?;')
-			.bind(user.display_name, user.email, user.notice ?? null, user.user_id)
+			.prepare('UPDATE users SET display_name = ?, notice = ? WHERE user_id = ?;')
+			.bind(user.display_name, user.notice ?? null, user.user_id)
 			.run()
 	} catch (err) {
 		console.error(err)
