@@ -29,9 +29,7 @@
 		Ort für dich zu machen:
 	</p>
 	<p>
-		<a href="mailto:support@aloso.foo?subject=Beschwerde wg. Sperrung meines Exponent-Accounts">
-			Kontakt
-		</a>
+		<a href="mailto:support@aloso.foo">Kontakt</a>
 	</p>
 	<p>
 		Ebenso sind Spamming, Trolling, Flaming, Baiting oder andere Verhaltensweisen, die

@@ -19,13 +19,14 @@
 	import Gestures from './Gestures.svelte'
 
 	interface Props {
+		small?: boolean
 		level: Level
 		noGestures?: boolean
 		noGoal?: boolean
 		highlights?: string[][]
 	}
 
-	let { level, noGestures, noGoal, highlights }: Props = $props()
+	let { small, level, noGestures, noGoal, highlights }: Props = $props()
 
 	let pos = $state(level.pos)
 	let lastPos = $state(level.pos)
@@ -178,6 +179,7 @@
 
 <div
 	class="field"
+	class:small
 	class:hidden-fields={level.mode.hidden}
 	style="--aspect-ratio: {pos.squares.length / pos.squares[0].length}; --columns: {pos.squares[0]
 		.length}"
@@ -223,6 +225,11 @@
 
 		&.hidden-fields {
 			color: transparent !important;
+		}
+
+		&.small {
+			width: 100%;
+			font-size: calc(0.15 * var(--app-width) / var(--columns, 4));
 		}
 	}
 

@@ -13,7 +13,8 @@ create table users (
     `email` text not null,
     `google_id` text unique,
     `reported` integer default 0,
-    `notice` text
+    `notice` text,
+    `trust_level` integer default 0
 );
 create index idx_users_google_id on users (google_id);
 
@@ -28,7 +29,7 @@ create table levels (
     `desc` text,
     `author_id` integer not null,
     `created` integer not null,
-    `votes` integer not null,
+    `votes` integer default 0,
     `difficulty` integer,
     `data` text not null
 );

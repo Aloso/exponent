@@ -4,7 +4,7 @@
 
 	interface Props {
 		children: Snippet
-		actions: { label: string; action: () => void }[]
+		actions: { label: string; action: () => void; disabled?: boolean }[]
 	}
 
 	let { children, actions }: Props = $props()
@@ -17,8 +17,8 @@
 <Gestures zIndex={101} onMove={() => {}} />
 
 <div class="buttons">
-	{#each actions as action (action.label)}
-		<button class="button" onclick={action.action}>{action.label}</button>
+	{#each actions as { action, label, disabled } (label)}
+		<button class="button" onclick={action} {disabled}>{label}</button>
 	{/each}
 </div>
 

@@ -7,18 +7,23 @@
 	import GameResultOverlay from '../components/GameResultOverlay.svelte'
 	import LevelHeader from '../components/LevelHeader.svelte'
 	import GameRules from '../components/GameRules.svelte'
+	import type { LevelInputDto } from '$lib/api/types'
 
 	interface Props {
 		level: Level
+		loggedIn?: boolean
 	}
 
-	let { level }: Props = $props()
+	let { level, loggedIn }: Props = $props()
 
 	let pos = $state(level.pos)
 	let field = $state<Field>()
 	let levelResult: 'won' | 'lost' | undefined = $state()
 	let saved = $derived(appState.currentLevel)
 	let copied = $state(false)
+
+	let publishing = $state(false)
+	let publishMessage = $state<string>()
 
 	$effect(() => {
 		level
@@ -63,6 +68,42 @@
 		} else {
 			await navigator.clipboard.writeText(text)
 			copied = true
+		}
+	}
+
+	async function publish() {
+		publishing = true
+
+		const levelDto: LevelInputDto = {
+			name: level.name,
+			data: level.encoded!!,
+		}
+
+		const response = await fetch('/api/levels', {
+			method: 'post',
+			body: JSON.stringify(levelDto),
+			redirect: 'follow',
+		})
+		if (!response.ok) {
+			switch (response.status) {
+				case 429:
+					publishMessage =
+						'Fehler: Du hast in den letzten 24 Stunden bereits 5 Level veröffentlicht, mehr ist nicht erlaubt.'
+					break
+				case 401:
+					publishMessage = 'Fehler: Du bist nicht angemeldet'
+					break
+				case 403:
+					publishMessage = 'Fehler: Keine Berechtigung'
+					break
+				default:
+					publishMessage = 'Beim Veröffentlichen ist ein Fehler aufgetreten'
+			}
+		} else {
+			publishMessage = 'Erfolgreich veröffentlicht!'
+			setTimeout(() => {
+				goto('/account')
+			}, 1000)
 		}
 	}
 
@@ -116,16 +157,24 @@
 {:else if levelResult}
 	{#if levelResult === 'won'}
 		<GameResultOverlay
-			actions={[
-				{ label: 'Teilen', action: share },
-				{ label: 'Zum Hauptmenü', action: finish },
-			]}
+			actions={loggedIn
+				? [
+						{ label: 'Veröffentlichen', action: publish, disabled: publishing },
+						{ label: 'Hauptmenü', action: finish },
+					]
+				: [
+						{ label: 'Teilen', action: share },
+						{ label: 'Hauptmenü', action: finish },
+					]}
 		>
 			<h1>Level abgeschlossen</h1>
 			<p class="emoji">🎉</p>
-			<p>Du kannst den Level nun mit anderen teilen!</p>
+			<p>Du kannst den Level nun {loggedIn ? 'veröffentlichen' : 'mit anderen teilen'}!</p>
 			{#if copied}
 				<p>Link wurde kopiert.</p>
+			{/if}
+			{#if publishMessage}
+				<p>{publishMessage}</p>
 			{/if}
 		</GameResultOverlay>
 	{:else}

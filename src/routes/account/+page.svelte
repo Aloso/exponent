@@ -4,6 +4,7 @@
 	import type { Data } from './+page.server'
 	import { dev } from '$app/environment'
 	import EditProfile from '../../components/EditProfile.svelte'
+	import LevelPreview from '../../components/LevelPreview.svelte'
 
 	interface Props {
 		data: Data
@@ -67,11 +68,22 @@
 			<EditProfile bind:user onclose={() => (editingProfile = false)} />
 		{/if}
 
-		<h3>Von dir veröffentlichte Level</h3>
-		<p>Diese Funktion ist noch in Konstruktion 🚧</p>
-		<p>
-			<a class="button action-button" href="/level-builder">Level erstellen</a>
-		</p>
+		<h3>Deine Level</h3>
+		{#if !data.levels || data.levels.length === 0}
+			<p>Du hast noch keine Level veröffentlicht</p>
+			<p>
+				<a class="button action-button" href="/level-builder">Level erstellen</a>
+			</p>
+		{:else}
+			<p>
+				<a class="button action-button" href="/level-builder">Level erstellen</a>
+			</p>
+			<div class="level-grid">
+				{#each data.levels as level}
+					<LevelPreview {level} />
+				{/each}
+			</div>
+		{/if}
 	</div>
 {:else}
 	<div class="login-wrapper">
@@ -124,5 +136,11 @@
 		background-color: #fff2;
 		padding-block: 0.4rem;
 		font-size: 0.9rem;
+	}
+
+	.level-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1rem;
 	}
 </style>
