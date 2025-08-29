@@ -1,9 +1,9 @@
 import { authorize } from '$lib/api/authorize.js'
-import { getLevels, type LevelFilters } from '$lib/api/getLevels'
+import { getLevel, getLevels, type LevelFilters } from '$lib/api/getLevels'
 import { getInteger } from '$lib/api/parseParams.js'
 import { saveLevel } from '$lib/api/saveLevel.js'
 import { levelInputDtoSchema, type LevelDto } from '$lib/api/types.js'
-import { error } from '@sveltejs/kit'
+import { error, json } from '@sveltejs/kit'
 
 export interface LevelsResult {
 	levels: LevelDto[]
@@ -14,6 +14,12 @@ export async function GET({ request, platform }): Promise<Response> {
 	if (!platform) error(500, 'Platform not available')
 
 	const { searchParams } = new URL(request.url)
+
+	const level_id = getInteger(searchParams, 'level_id')
+	if (level_id !== undefined) {
+		const level = await getLevel(level_id, platform.env.DB)
+		return json(level)
+	}
 
 	const filters: LevelFilters = {
 		limit: (getInteger(searchParams, 'limit', { min: 0, max: 200 }) ?? 50) + 1,

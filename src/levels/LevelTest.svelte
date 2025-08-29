@@ -6,7 +6,7 @@
 	import Field from '../components/Field.svelte'
 	import GameResultOverlay from '../components/GameResultOverlay.svelte'
 	import LevelHeader from '../components/LevelHeader.svelte'
-	import GameRules from '../components/GameRules.svelte'
+	import GameOptions from '../components/GameOptions.svelte'
 	import type { LevelInputDto } from '$lib/api/types'
 
 	interface Props {
@@ -150,7 +150,7 @@
 
 <Field {level} bind:this={field} />
 
-<GameRules rules={level.rules} onMove={field?.move} />
+<GameOptions rules={level.rules} onMove={field?.move} />
 
 {#if level.overlay}
 	<level.overlay {pos} {field} onFinished={finish} />

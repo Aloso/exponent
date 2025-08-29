@@ -82,6 +82,11 @@
 		box-shadow: inset 0 0.5rem 0 0.05rem #00000008;
 		user-select: none;
 
+		:global(.small) & {
+			box-shadow: inset 0 0.25rem 0 0.05rem #00000008;
+			border-radius: 0.15rem;
+		}
+
 		&.empty {
 			background-color: transparent;
 			box-shadow: none;
@@ -121,6 +126,11 @@
 		&.full {
 			background-color: var(--color, #fff3);
 			box-shadow: inset 0 -0.5rem 0 #00000017;
+
+			:global(.small) & {
+				box-shadow: inset 0 -0.25rem 0 #00000017;
+				border-radius: 0.15rem;
+			}
 
 			:global(.hidden-fields) &::after {
 				position: absolute;

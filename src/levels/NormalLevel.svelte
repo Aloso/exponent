@@ -6,14 +6,15 @@
 	import Field from '../components/Field.svelte'
 	import GameResultOverlay from '../components/GameResultOverlay.svelte'
 	import LevelHeader from '../components/LevelHeader.svelte'
-	import GameRules from '../components/GameRules.svelte'
+	import GameOptions, { type LevelData } from '../components/GameOptions.svelte'
 
 	interface Props {
 		level: Level
+		levelData?: LevelData
 		navigate: (levelId: string) => void
 	}
 
-	let { level, navigate }: Props = $props()
+	let { level, levelData, navigate }: Props = $props()
 
 	let pos = $state(level.pos)
 	let field = $state<Field>()
@@ -97,7 +98,7 @@
 
 <Field {level} bind:this={field} />
 
-<GameRules rules={level.rules} onMove={field?.move} />
+<GameOptions rules={level.rules} onMove={field?.move} {levelData} />
 
 {#if level.overlay}
 	<level.overlay {pos} {field} onFinished={finish} />

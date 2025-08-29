@@ -7,7 +7,7 @@
 		zIndex?: number
 		onMove: (direction: Direction) => void
 		surface?: HTMLElement
-		onClick?: () => void
+		onClick?: (target: HTMLElement) => void
 		children?: Snippet
 	}
 
@@ -53,15 +53,18 @@
 		}
 
 		let gestureStart: { x: number; y: number } | undefined
+		let clickStart: HTMLElement | undefined
 
 		const touchStartHandler = (event: TouchEvent) => {
 			gestureStart = { x: event.touches[0].clientX, y: event.touches[0].clientY }
+			clickStart = event.target as HTMLElement
 			event.preventDefault()
 			event.stopImmediatePropagation()
 		}
 		const pointerDownHandler = (event: PointerEvent) => {
 			if (!gestureStart) {
 				gestureStart = { x: event.clientX, y: event.clientY }
+				clickStart = event.target as HTMLElement
 				event.preventDefault()
 				event.stopImmediatePropagation()
 			}
@@ -97,15 +100,17 @@
 		}
 
 		const endHandler = (event: PointerEvent | TouchEvent) => {
-			if (gestureStart && onClick && event.target === surface) {
-				onClick()
+			if (gestureStart && onClick && event.target === clickStart) {
+				onClick(clickStart)
 			}
 
 			gestureStart = undefined
+			clickStart = undefined
 		}
 
 		const cancelHandler = () => {
 			gestureStart = undefined
+			clickStart = undefined
 		}
 
 		if (withKeyboard) window.addEventListener('keydown', keyDownHandler)

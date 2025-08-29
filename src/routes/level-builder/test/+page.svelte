@@ -10,8 +10,6 @@
 	let user = $state<SafeUser>()
 	let loggedIn = $state<boolean>()
 
-	$inspect(user)
-
 	onMount(async () => {
 		let queryParams = new URLSearchParams(window.location.search)
 		let serialized = queryParams.get('level')
@@ -25,17 +23,7 @@
 			}
 		}
 
-		try {
-			const response = await fetch('/api/user')
-			if (response.ok) {
-				user = await response.json()
-				loggedIn = true
-			} else {
-				loggedIn = false
-			}
-		} catch {
-			loggedIn = false
-		}
+		loggedIn = localStorage.getItem('userAccount') !== null
 	})
 </script>
 

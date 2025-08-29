@@ -97,6 +97,8 @@
 		display: flex;
 		padding: 1rem;
 		border-radius: 2rem;
+		color: inherit;
+		text-decoration: none;
 		cursor: pointer;
 
 		:global(svg) {
@@ -108,7 +110,7 @@
 
 	h1 {
 		text-align: center;
-		font-size: 1.45rem;
+		font-size: 1.35rem;
 		line-height: 1.75rem;
 		user-select: none;
 		flex-grow: 1;

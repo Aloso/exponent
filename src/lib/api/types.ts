@@ -27,6 +27,7 @@ export interface LevelDto {
 	author: Author
 	created: number
 	votes: number
+	my_vote?: number
 	difficulty?: number
 	data: string
 }

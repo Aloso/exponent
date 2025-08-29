@@ -39,9 +39,9 @@ create table level_votes (
     `level_id` integer not null,
     `user_id` integer not null,
     `vote` integer not null,
-    `created` integer not null
+    `created` integer not null,
+    primary key (level_id, user_id)
 );
-create index idx_levels_votes_user on level_votes (user_id);
 
 create table user_reports (
     `user_id` integer not null,

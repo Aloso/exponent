@@ -6,23 +6,28 @@
 	import Header from '../components/Header.svelte'
 	import MusicButton from '../components/MusicButton.svelte'
 	import { shouldUpdate } from '$lib/startTime'
-	import { areAllLevelsCompleted, isTutorialCompleted } from '$lib/appState.svelte'
+	import { isTutorialCompleted } from '$lib/appState.svelte'
+	import type { SafeUser } from '$lib/api/types'
 
 	let installation = useSpaInstallation()
 	let shouldReload = $state(false)
-	let showLevelBuilder = $derived(areAllLevelsCompleted())
 	let showExtras = $derived(isTutorialCompleted())
+	let accountUser = $state<SafeUser>()
 
 	onMount(async () => {
 		if (!shouldReload) {
 			shouldReload = await shouldUpdate()
+		}
+		const storedUser = localStorage.getItem('userAccount')
+		if (storedUser) {
+			accountUser = JSON.parse(storedUser)
 		}
 	})
 </script>
 
 <Header>
 	{#snippet action1()}
-		<a class="header-action-button" aria-label="Account" href="/account">
+		<a class="header-action-button with-text" href="/account">
 			<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
 				<path
 					style="fill:#ffffff"
@@ -30,6 +35,7 @@
 				/>
 				<circle style="fill:#ffffff" cx="32" cy="19" r="14" />
 			</svg>
+			{accountUser ? accountUser.display_name : 'Account'}
 		</a>
 	{/snippet}
 	{#snippet action2()}
@@ -65,6 +71,14 @@
 
 <style lang="scss">
 	@use '../helper';
+
+	.header-action-button.with-text {
+		line-height: 1.4rem;
+
+		svg {
+			margin-right: 0.5rem;
+		}
+	}
 
 	.content {
 		margin: auto;
