@@ -49,7 +49,7 @@
 			onClick={(target) => {
 				const { tab } = target.dataset
 				if (tab === 'author') {
-					goto(`/users?id=${levelData!.author.user_id}`)
+					goto(`/user?id=${levelData!.author.user_id}`)
 				} else if (tab === 'menu' || tab === 'rules') {
 					open = open === tab ? undefined : tab
 				}
