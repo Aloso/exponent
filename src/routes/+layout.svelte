@@ -10,7 +10,6 @@
 	}
 
 	let { children }: Props = $props()
-	let clientWidth = $state(0)
 
 	onMount(() => {
 		loadConfig()
@@ -33,7 +32,7 @@
 	/>
 </svelte:head>
 
-<div class="app" bind:clientWidth style="--app-width: {clientWidth}px">
+<div class="app">
 	{@render children()}
 </div>
 

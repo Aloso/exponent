@@ -22,16 +22,17 @@
 		small?: boolean
 		level: Level
 		noGestures?: boolean
-		noGoal?: boolean
 		highlights?: string[][]
 	}
 
-	let { small, level, noGestures, noGoal, highlights }: Props = $props()
+	let { small, level, noGestures, highlights }: Props = $props()
 
 	let pos = $state(level.pos)
 	let lastPos = $state(level.pos)
 	let lastMoveTime = 0
 	let goal = $state(level.goal)
+
+	let clientWidth = $state(480)
 
 	$effect(() => {
 		pos = level.pos
@@ -182,7 +183,8 @@
 	class:small
 	class:hidden-fields={level.mode.hidden}
 	style="--aspect-ratio: {pos.squares.length / pos.squares[0].length}; --columns: {pos.squares[0]
-		.length}"
+		.length}; --width: {clientWidth}px"
+	bind:clientWidth
 >
 	<div class="outer">
 		<div class="inner">
@@ -200,36 +202,23 @@
 	</div>
 </div>
 
-{#if !noGoal}
-	{#if typeof goal === 'number'}
-		<div class="goal">Erreiche die Zahl <em>{goal}</em>.</div>
-	{:else if goal}
-		{#if goal.fields > 1}
-			<div class="goal">Fülle die <em>Zielfelder</em> mit der erwarteten Zahl.</div>
-		{:else}
-			<div class="goal">Fülle das <em>Zielfeld</em> mit der erwarteten Zahl.</div>
-		{/if}
-	{/if}
-{/if}
-
 {#if !noGestures}
 	<Gestures withKeyboard onMove={move} />
 {/if}
 
 <style lang="scss">
 	.field {
-		width: 90%;
 		margin: 0 auto;
 		animation: appear-from-center 0.3s ease forwards;
-		font-size: calc(0.3 * var(--app-width) / var(--columns, 4));
+		font-size: calc(0.33 * var(--width) / var(--columns, 4));
 
 		&.hidden-fields {
 			color: transparent !important;
 		}
 
-		&.small {
-			width: 100%;
-			font-size: calc(0.15 * var(--app-width) / var(--columns, 4));
+		&:not(.small) {
+			width: 90%;
+			max-width: calc((100svh - 12rem) / var(--aspect-ratio));
 		}
 	}
 
@@ -261,10 +250,5 @@
 		display: grid;
 		width: 100%;
 		grid-template-columns: repeat(var(--columns), 1fr);
-	}
-
-	.goal {
-		margin: 2rem 0 1rem 0;
-		text-align: center;
 	}
 </style>

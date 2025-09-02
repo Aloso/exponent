@@ -21,7 +21,7 @@ export function gameLogic(mode: LevelMode, squares: Square[][], direction: Direc
 					incTail()
 				}
 			} else if (tail.variant === 'mouth') {
-				if (tail.direction !== direction) {
+				if (tail.direction !== direction || head.variant === 'wall' || head.variant === 'mouth') {
 					incTail()
 				} else if (head.num !== undefined) {
 					const old: SquareAnimationOld = { ...moveAnimation(hx - tx, hy - ty), num: head.num }

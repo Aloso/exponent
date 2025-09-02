@@ -231,7 +231,7 @@
 	</div>
 </div>
 
-<Field bind:this={field} {level} noGestures noGoal {highlights} />
+<Field bind:this={field} {level} noGestures {highlights} />
 
 {#if selected}
 	<div class="selected-editor section">

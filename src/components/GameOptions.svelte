@@ -40,22 +40,34 @@
 			me = JSON.parse(stored)
 		}
 	})
+
+	function clickGestureSurface(target: HTMLElement) {
+		const { tab } = target.dataset
+		if (tab === 'author') {
+			goto(`/user?id=${levelData!.author.user_id}`)
+		} else if (tab === 'menu' || tab === 'rules') {
+			open = open === tab ? undefined : tab
+			setTimeout(() => {
+				if (open) {
+					target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+				} else {
+					window.scrollTo({ left: 0, top: 0, behavior: 'smooth' })
+				}
+			})
+		}
+	}
+
+	function close() {
+		open = undefined
+		setTimeout(() => {
+			window.scrollTo({ left: 0, top: 0, behavior: 'smooth' })
+		})
+	}
 </script>
 
-{#if !tutorial}
+{#if !tutorial && (levelData || importantRules.length)}
 	<div class="tab-wrapper">
-		<Gestures
-			{onMove}
-			onClick={(target) => {
-				const { tab } = target.dataset
-				if (tab === 'author') {
-					goto(`/user?id=${levelData!.author.user_id}`)
-				} else if (tab === 'menu' || tab === 'rules') {
-					open = open === tab ? undefined : tab
-				}
-			}}
-			{surface}
-		>
+		<Gestures {onMove} onClick={clickGestureSurface} {surface}>
 			<div class="tabbbar" bind:this={surface}>
 				{#if levelData}
 					<div class="level-data">
@@ -75,7 +87,7 @@
 
 		{#if open === 'rules'}
 			<div class="rules-box">
-				<button class="close-button" onclick={() => (open = undefined)}>×</button>
+				<button class="close-button" onclick={close}>×</button>
 
 				{#each importantRules as rule}
 					<GameRule {rule} />
@@ -83,7 +95,7 @@
 			</div>
 		{:else if open === 'menu' && levelData}
 			<div class="menu-box">
-				<button class="close-button" onclick={() => (open = undefined)}>×</button>
+				<button class="close-button" onclick={close}>×</button>
 
 				<LevelRating
 					levelId={levelData.levelId}
@@ -102,7 +114,7 @@
 
 	.tab-wrapper {
 		width: 90%;
-		margin: 1rem 2rem;
+		margin: 1rem 2rem 0;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -152,7 +164,7 @@
 		width: 100%;
 		box-sizing: border-box;
 		padding: 0 1rem;
-		margin: 1rem 0;
+		margin: 1rem 0 0 0;
 		border-radius: 0.5rem;
 		background-color: #6c016c;
 	}

@@ -12,7 +12,7 @@
 </script>
 
 <a class="wrapper button" href="/level?l={level.level_id}">
-	<Field small level={deserializeB64(level.data)} noGestures noGoal />
+	<Field small level={deserializeB64(level.data)} noGestures />
 	<h3>{level.name}</h3>
 	<p>
 		<span class="date">{formatDateRelative(level.created)}</span>

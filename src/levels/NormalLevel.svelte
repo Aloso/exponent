@@ -7,6 +7,7 @@
 	import GameResultOverlay from '../components/GameResultOverlay.svelte'
 	import LevelHeader from '../components/LevelHeader.svelte'
 	import GameOptions, { type LevelData } from '../components/GameOptions.svelte'
+	import Goal from '../components/Goal.svelte'
 
 	interface Props {
 		level: Level
@@ -97,8 +98,10 @@
 <LevelHeader {level} {undo} canUndo={field?.canUndo()} />
 
 <Field {level} bind:this={field} />
-
 <GameOptions rules={level.rules} onMove={field?.move} {levelData} />
+{#if !level.overlay}
+	<Goal goal={level.goal} />
+{/if}
 
 {#if level.overlay}
 	<level.overlay {pos} {field} onFinished={finish} />
