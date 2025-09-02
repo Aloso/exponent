@@ -13,9 +13,10 @@
 	interface Props {
 		level: Level
 		loggedIn?: boolean
+		cheat?: boolean
 	}
 
-	let { level, loggedIn }: Props = $props()
+	let { level, loggedIn, cheat }: Props = $props()
 
 	let pos = $state(level.pos)
 	let field = $state<Field>()
@@ -157,8 +158,8 @@
 
 {#if level.overlay}
 	<level.overlay {pos} {field} onFinished={finish} />
-{:else if levelResult}
-	{#if levelResult === 'won'}
+{:else if cheat || levelResult}
+	{#if cheat || levelResult === 'won'}
 		<GameResultOverlay
 			actions={loggedIn
 				? [

@@ -3,11 +3,11 @@
 	import { onMount } from 'svelte'
 	import LevelTest from '../../../levels/LevelTest.svelte'
 	import { deserializeB64 } from '$lib/serde'
-	import type { SafeUser } from '$lib/api/types'
 
 	let level = $state<Level>()
 	let error = $state<string>()
 	let loggedIn = $state<boolean>()
+	let cheat = $state(false)
 
 	onMount(async () => {
 		let queryParams = new URLSearchParams(window.location.search)
@@ -23,6 +23,7 @@
 		}
 
 		loggedIn = localStorage.getItem('userAccount') !== null
+		cheat = localStorage.getItem('cheat') === 'true'
 	})
 </script>
 
@@ -33,7 +34,7 @@
 {/if}
 
 {#if level}
-	<LevelTest {level} {loggedIn} />
+	<LevelTest {level} {loggedIn} {cheat} />
 {/if}
 
 <style lang="scss">
