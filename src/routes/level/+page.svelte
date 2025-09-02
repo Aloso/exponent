@@ -6,6 +6,7 @@
 	import { deserializeB64 } from '$lib/serde'
 	import type { LevelDto } from '$lib/api/types'
 	import type { LevelData } from '../../components/GameOptions.svelte'
+	import { levelDtoToData } from '$lib/levelDto'
 
 	let level = $state<Level>()
 	let error = $state<string>()
@@ -33,15 +34,7 @@
 			} else {
 				const levelDto: LevelDto = await response.json()
 				level = deserializeB64(levelDto.data)
-				levelData = {
-					levelId: levelDto.level_id,
-					author: levelDto.author,
-					created: levelDto.created,
-					votes: levelDto.votes,
-					myVote: levelDto.my_vote,
-					desc: levelDto.desc,
-					difficulty: levelDto.difficulty,
-				}
+				levelData = levelDtoToData(levelDto)
 			}
 		} else if (queryParams.has('code')) {
 			level = deserializeB64(queryParams.get('code')!)
@@ -64,7 +57,7 @@
 {/if}
 
 {#if level}
-	<NormalLevel {level} {levelData} {navigate} />
+	<NormalLevel {level} {levelData} {navigate} continueBack />
 {/if}
 
 <style lang="scss">

@@ -8,14 +8,22 @@
 	import LevelHeader from '../components/LevelHeader.svelte'
 	import GameOptions, { type LevelData } from '../components/GameOptions.svelte'
 	import Goal from '../components/Goal.svelte'
+	import type { SafeUser } from '$lib/api/types'
+	import LevelRating from '../components/LevelRating.svelte'
 
 	interface Props {
 		level: Level
 		levelData?: LevelData
 		navigate: (levelId: string) => void
+		continueBack?: boolean
 	}
 
-	let { level, levelData, navigate }: Props = $props()
+	let { level, levelData, navigate, continueBack }: Props = $props()
+
+	let me = $state<SafeUser>()
+
+	let currentName = $state(level.name)
+	let currentData = $state(levelData)
 
 	let pos = $state(level.pos)
 	let field = $state<Field>()
@@ -48,6 +56,7 @@
 
 	function finish() {
 		if (nextLevel) navigate(nextLevel.id)
+		else if (continueBack) history.back()
 		else goto('/')
 	}
 
@@ -65,6 +74,11 @@
 	}
 
 	onMount(() => {
+		const storedUser = localStorage.getItem('userAccount')
+		if (storedUser) {
+			me = JSON.parse(storedUser)
+		}
+
 		const winHandler = field!.on('win', (event) => {
 			if (level.id !== 'custom') addCompletedLevel(level.id)
 			if (!level.overlay) levelResult = 'won'
@@ -95,10 +109,19 @@
 	})
 </script>
 
-<LevelHeader {level} {undo} canUndo={field?.canUndo()} />
+<LevelHeader name={currentName} {level} {undo} canUndo={field?.canUndo()} />
 
 <Field {level} bind:this={field} />
-<GameOptions rules={level.rules} onMove={field?.move} {levelData} />
+<GameOptions
+	{me}
+	rules={level.rules}
+	onMove={field?.move}
+	levelData={currentData}
+	onChange={(data) => {
+		currentName = data.name
+		currentData = data
+	}}
+/>
 {#if !level.overlay}
 	<Goal goal={level.goal} />
 {/if}
@@ -110,7 +133,10 @@
 		<GameResultOverlay
 			actions={[
 				{ label: 'Wiederholen', action: reset },
-				{ label: nextLevel ? 'Nächster Level' : 'Zum Hauptmenü', action: finish },
+				{
+					label: nextLevel ? 'Nächster Level' : continueBack ? 'Fertig' : 'Zum Hauptmenü',
+					action: finish,
+				},
 			]}
 		>
 			<h1>Level {level.number ?? ''} abgeschlossen</h1>
@@ -130,6 +156,18 @@
 			<p class="description">Auf dem Spielfeld ist kein Platz mehr.</p>
 		</GameResultOverlay>
 	{/if}
+{/if}
+
+{#if levelResult === 'won' && me && currentData && currentData.author.user_id !== me.user_id}
+	<div class="rating">
+		<LevelRating
+			small
+			levelId={currentData.levelId}
+			canVote
+			votes={currentData.votes}
+			myVote={currentData.myVote ?? 0}
+		/>
+	</div>
 {/if}
 
 <style lang="scss">
@@ -158,5 +196,19 @@
 	.description {
 		text-align: center;
 		user-select: none;
+	}
+
+	.rating {
+		display: flex;
+		background-color: #fff2;
+		z-index: 102;
+		position: fixed;
+		left: 0;
+		right: 0;
+		bottom: 9rem;
+		width: fit-content;
+		margin: 0 auto;
+		padding: 0 0.8rem;
+		border-radius: 2rem;
 	}
 </style>

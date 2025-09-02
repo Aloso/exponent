@@ -3,19 +3,20 @@
 	import Header from './Header.svelte'
 
 	interface Props {
+		name: string
 		level: Level
 		undo: () => void
 		canUndo?: boolean
 	}
 
-	let { level, undo, canUndo }: Props = $props()
+	let { name, level, undo, canUndo }: Props = $props()
 </script>
 
 <Header back={true}>
 	{#if level.number !== undefined}
 		<span class="lvl-number">{level.number}</span>
 	{/if}
-	{level.name}
+	{name}
 
 	{#snippet action2()}
 		<button class="header-action-button" aria-label="Rückgängig" onclick={undo} disabled={!canUndo}>

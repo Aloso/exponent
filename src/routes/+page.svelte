@@ -53,7 +53,7 @@
 			goto('/campaign')
 		}}>Start</button
 	>
-	<a href="/extras" class="button extras-button" class:hidden={!showExtras}>Tägliche Challenge</a>
+	<a href="/marketplace" class="button extras-button" class:hidden={!showExtras}>Marktplatz</a>
 
 	<button
 		class="install-button"

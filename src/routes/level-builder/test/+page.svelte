@@ -7,7 +7,6 @@
 
 	let level = $state<Level>()
 	let error = $state<string>()
-	let user = $state<SafeUser>()
 	let loggedIn = $state<boolean>()
 
 	onMount(async () => {

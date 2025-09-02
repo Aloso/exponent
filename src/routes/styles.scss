@@ -27,7 +27,8 @@ button,
 }
 
 input[type='number'],
-input[type='text'] {
+input[type='text'],
+textarea {
 	background-color: #0002;
 	border: none;
 	font: inherit;
@@ -42,6 +43,10 @@ input[type='text'] {
 		outline: none;
 		background-color: #0004;
 	}
+}
+
+textarea {
+	resize: vertical;
 }
 
 em {

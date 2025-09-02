@@ -39,6 +39,19 @@ export interface LevelInputDto {
 	data: string
 }
 
+export interface LevelUpdateDto {
+	level_id: number
+	name?: string
+	desc?: string
+	difficulty?: number
+}
+
+export interface ReportDto {
+	user_id: number
+	level_id?: number
+	reason: string
+}
+
 export interface Author {
 	user_id: number
 	display_name: string
@@ -52,5 +65,22 @@ export function levelInputDtoSchema(): Schema<LevelInputDto> {
 		desc: v.string().optional(),
 		difficulty: v.integer().optional(),
 		data: v.string(),
+	})
+}
+
+export function levelUpdateDtoSchema(): Schema<LevelUpdateDto> {
+	return v.object({
+		level_id: v.integer(),
+		name: v.string().optional(),
+		desc: v.string().optional(),
+		difficulty: v.integer().optional(),
+	})
+}
+
+export function reportDtoSchema(): Schema<ReportDto> {
+	return v.object({
+		user_id: v.integer(),
+		level_id: v.integer().optional(),
+		reason: v.string(),
 	})
 }

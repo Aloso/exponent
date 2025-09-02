@@ -47,6 +47,8 @@ create table user_reports (
     `user_id` integer not null,
     `reporter_id` integer not null,
     `created` integer not null,
-    `reason` text
+    `level_id` integer,
+    `reason` text,
+    primary key (user_id, reporter_id, level_id)
 );
 create index idx_user_reports_user on user_reports (user_id);

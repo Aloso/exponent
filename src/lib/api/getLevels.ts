@@ -22,8 +22,6 @@ export async function getLevel(id: number, db: D1Database): Promise<LevelDto> {
 		error(404, 'Level nicht gefunden')
 	}
 
-	console.log(level)
-
 	return dbResultToDto(level)
 }
 

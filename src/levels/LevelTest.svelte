@@ -48,7 +48,7 @@
 	})
 
 	function finish() {
-		goto('/')
+		close()
 	}
 
 	function reset() {
@@ -147,7 +147,7 @@
 	<title>{level.name} - Exponent</title>
 </svelte:head>
 
-<LevelHeader {level} {undo} canUndo={field?.canUndo()} />
+<LevelHeader name={level.name} {level} {undo} canUndo={field?.canUndo()} />
 
 <Field {level} bind:this={field} />
 <GameOptions rules={level.rules} onMove={field?.move} />
@@ -163,11 +163,11 @@
 			actions={loggedIn
 				? [
 						{ label: 'Veröffentlichen', action: publish, disabled: publishing },
-						{ label: 'Hauptmenü', action: finish },
+						{ label: 'Fertig', action: finish },
 					]
 				: [
 						{ label: 'Teilen', action: share },
-						{ label: 'Hauptmenü', action: finish },
+						{ label: 'Fertig', action: finish },
 					]}
 		>
 			<h1>Level abgeschlossen</h1>

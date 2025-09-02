@@ -6,9 +6,10 @@
 
 	interface Props {
 		level: LevelDto
+		withAuthor?: boolean
 	}
 
-	let { level }: Props = $props()
+	let { level, withAuthor }: Props = $props()
 </script>
 
 <a class="wrapper button" href="/level?l={level.level_id}">
@@ -32,7 +33,9 @@
 			</span>
 		{/if}
 	</p>
-	{#if level.desc}
+	{#if withAuthor}
+		<p>von <em>{level.author.display_name}</em></p>
+	{:else if level.desc}
 		<p class="ellipsis">{level.desc}</p>
 	{/if}
 </a>

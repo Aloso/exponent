@@ -1,12 +1,13 @@
 <script lang="ts">
 	interface Props {
+		small?: boolean
 		levelId: number
 		votes: number
 		myVote: number
 		canVote: boolean
 	}
 
-	let { levelId, votes, myVote, canVote }: Props = $props()
+	let { small, levelId, votes, myVote, canVote }: Props = $props()
 	let error = $state<string>()
 
 	let myCurrentVote = $state(myVote)
@@ -27,8 +28,10 @@
 	}
 </script>
 
-<p class="rating">
-	<span>Bewertung</span>
+<p class="rating" class:small>
+	{#if !small}
+		<span>Bewertung</span>
+	{/if}
 	<button
 		onclick={() => (myCurrentVote === -1 ? save(0) : save(-1))}
 		disabled={!canVote}
@@ -87,6 +90,10 @@
 		display: flex;
 		gap: 0.5rem;
 		align-items: center;
+
+		&.small {
+			justify-content: center;
+		}
 
 		button {
 			padding: 0.3rem 0.5rem;

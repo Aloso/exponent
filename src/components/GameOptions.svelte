@@ -4,10 +4,12 @@
 	import { formatDateRelative } from '$lib/dateTime'
 	import type { Direction } from '$lib/events'
 	import type { LevelRule } from '$lib/levels'
-	import { onMount } from 'svelte'
 	import GameRule from './GameRule.svelte'
 	import Gestures from './Gestures.svelte'
 	import LevelRating from './LevelRating.svelte'
+	import DeleteLevelModal from './modals/DeleteLevelModal.svelte'
+	import EditLevelModal from './modals/EditLevelModal.svelte'
+	import ReportLevelModal from './modals/ReportLevelModal.svelte'
 
 	export interface LevelData {
 		levelId: number
@@ -15,31 +17,27 @@
 		created: number
 		votes: number
 		myVote?: number
+		name: string
 		desc?: string
 		difficulty?: number
 	}
 
 	interface Props {
+		me?: SafeUser
 		rules: LevelRule[]
 		levelData?: LevelData
 		onMove: (direction: Direction) => void
+		onChange?: (levelData: LevelData) => void
 	}
 
-	let { rules, levelData, onMove }: Props = $props()
+	let { me, rules, levelData, onMove, onChange }: Props = $props()
 	let open = $state<'rules' | 'menu'>()
 	let tutorial = $derived(rules.includes('tutorial'))
 	let importantRules = $derived(rules.filter((r) => r !== 'default'))
 
 	let surface = $state<HTMLElement>()
 
-	let me = $state<SafeUser>()
-
-	onMount(() => {
-		const stored = localStorage.getItem('userAccount')
-		if (stored) {
-			me = JSON.parse(stored)
-		}
-	})
+	let active = $state<'deleting' | 'editing' | 'reporting'>()
 
 	function clickGestureSurface(target: HTMLElement) {
 		const { tab } = target.dataset
@@ -104,9 +102,60 @@
 					myVote={levelData.myVote ?? 0}
 				/>
 				<p>Erstellt: {formatDateRelative(levelData.created)}</p>
+				{#if levelData.desc}
+					<p class="desc">{levelData.desc}</p>
+				{/if}
+				{#if levelData.difficulty !== undefined}
+					<p>
+						Schwierigkeitsgrad: <em>{levelData.difficulty}</em> <span class="faded">/ 10</span>
+					</p>
+				{/if}
+				<p>
+					{#if me}
+						{#if me.user_id === levelData.author.user_id || me.trust_level >= 1}
+							<button class="action-button edit" onclick={() => (active = 'editing')}>
+								Bearbeiten
+							</button>
+						{/if}
+						{#if me.user_id === levelData.author.user_id || me.trust_level >= 2}
+							<button class="action-button delete" onclick={() => (active = 'deleting')}>
+								Löschen
+							</button>
+						{/if}
+						{#if me.user_id !== levelData.author.user_id}
+							<button class="action-button report" onclick={() => (active = 'reporting')}>
+								Melden
+							</button>
+						{/if}
+					{/if}
+				</p>
 			</div>
 		{/if}
 	</div>
+{/if}
+
+{#if active === 'deleting'}
+	<DeleteLevelModal
+		levelId={levelData!.levelId}
+		cancel={() => (active = undefined)}
+		afterDelete={() => goto('/account')}
+	/>
+{:else if active === 'editing'}
+	<EditLevelModal
+		levelData={levelData!}
+		cancel={() => (active = undefined)}
+		afterEdit={(data) => {
+			onChange?.(data)
+			active = undefined
+		}}
+	/>
+{:else if active === 'reporting'}
+	<ReportLevelModal
+		levelId={levelData!.levelId}
+		authorId={levelData!.author.user_id}
+		cancel={() => (active = undefined)}
+		afterReport={() => (active = undefined)}
+	/>
 {/if}
 
 <style lang="scss">
@@ -167,5 +216,25 @@
 		margin: 1rem 0 0 0;
 		border-radius: 0.5rem;
 		background-color: #6c016c;
+	}
+
+	.desc {
+		background-color: #0002;
+		padding: 0.4rem 0.8rem;
+		border-radius: 0.4rem;
+		white-space: pre-wrap;
+	}
+
+	.faded {
+		opacity: 0.6;
+	}
+
+	.action-button {
+		background-color: #fff2;
+		padding: 0.4rem 0.8rem;
+
+		&.delete {
+			background-color: #b00000;
+		}
 	}
 </style>

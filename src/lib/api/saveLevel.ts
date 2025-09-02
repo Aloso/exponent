@@ -2,16 +2,6 @@ import type { D1Database } from '@cloudflare/workers-types'
 import type { LevelInputDto } from './types'
 import { error } from '@sveltejs/kit'
 
-export interface LevelFilters {
-	author_id?: number
-	max_difficulty?: number
-	min_difficulty?: number
-	created_before?: number
-	created_after?: number
-	limit: number
-	after_id?: number
-}
-
 export async function saveLevel(
 	level: LevelInputDto,
 	author_id: number,
