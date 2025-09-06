@@ -117,7 +117,6 @@
 		eventName: 'move' | 'win' | 'lose' | 'undo' | 'click',
 		handler: FieldEventHandler,
 	) {
-		console.log('registered event handler:', eventName)
 		handlers[eventName].push(handler as any)
 		return handler
 	}
@@ -126,7 +125,6 @@
 		eventName: 'move' | 'win' | 'lose' | 'undo' | 'click',
 		handler: FieldEventHandler,
 	) {
-		console.log('removed event handler:', eventName)
 		handlers[eventName] = handlers[eventName].filter((h) => h !== handler) as any
 	}
 

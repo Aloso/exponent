@@ -8,6 +8,7 @@ export interface LevelFilters {
 	min_difficulty?: number
 	created_before?: number
 	created_after?: number
+	mode?: string
 	limit: number
 	after_id?: number
 	asc?: boolean
@@ -52,6 +53,10 @@ export async function getLevels(filters: LevelFilters, db: D1Database): Promise<
 		whereClauses.push(`l.created >= ?`)
 		bindings.push(filters.created_after)
 	}
+	if (filters.mode !== undefined) {
+		whereClauses.push(`l.mode = ?`)
+		bindings.push(filters.mode)
+	}
 	const where = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : ''
 
 	const query = `SELECT l.*, u.display_name user_name, u.user_id, u.picture user_picturer, u.trust_level user_trust_level, lv.vote my_vote
@@ -83,5 +88,6 @@ function dbResultToDto(l: Record<string, unknown>): LevelDto {
 		my_vote: l.my_vote as number,
 		difficulty: l.difficulty as number,
 		data: l.data as string,
+		mode: l.mode as string | undefined,
 	}
 }

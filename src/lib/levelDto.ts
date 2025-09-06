@@ -11,5 +11,6 @@ export function levelDtoToData(levelDto: LevelDto): LevelData {
 		name: levelDto.name,
 		desc: levelDto.desc,
 		difficulty: levelDto.difficulty,
+		mode: levelDto.mode,
 	}
 }

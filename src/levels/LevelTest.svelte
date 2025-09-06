@@ -76,9 +76,12 @@
 	async function publish() {
 		publishing = true
 
+		const mode = level.mode.id === 'default' ? undefined : level.mode.id
+
 		const levelDto: LevelInputDto = {
 			name: level.name,
 			data: level.encoded!!,
+			mode,
 		}
 
 		const response = await fetch('/api/levels', {

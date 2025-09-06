@@ -20,6 +20,7 @@
 		name: string
 		desc?: string
 		difficulty?: number
+		mode?: string
 	}
 
 	interface Props {

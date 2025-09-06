@@ -29,6 +29,7 @@ export interface LevelDto {
 	votes: number
 	my_vote?: number
 	difficulty?: number
+	mode?: string
 	data: string
 }
 
@@ -36,6 +37,7 @@ export interface LevelInputDto {
 	name: string
 	desc?: string
 	difficulty?: number
+	mode?: string
 	data: string
 }
 
@@ -64,6 +66,7 @@ export function levelInputDtoSchema(): Schema<LevelInputDto> {
 		name: v.string(),
 		desc: v.string().optional(),
 		difficulty: v.integer().optional(),
+		mode: v.string().optional(),
 		data: v.string(),
 	})
 }

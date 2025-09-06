@@ -3,6 +3,8 @@
 	import { formatDateRelative } from '$lib/dateTime'
 	import { deserializeB64 } from '$lib/serde'
 	import Field from './Field.svelte'
+	import ModeLabel from './ModeLabel.svelte'
+	import DifficultyLabel from './DifficultyLabel.svelte'
 
 	interface Props {
 		level: LevelDto
@@ -14,7 +16,11 @@
 
 <a class="wrapper button" href="/level?l={level.level_id}">
 	<Field small level={deserializeB64(level.data)} noGestures />
-	<h3>{level.name}</h3>
+	<h3>
+		{level.name}
+		<ModeLabel mode={level.mode} right />
+		<DifficultyLabel difficulty={level.difficulty} right />
+	</h3>
 	<p>
 		<span class="date">{formatDateRelative(level.created)}</span>
 		{#if level.votes !== 0}

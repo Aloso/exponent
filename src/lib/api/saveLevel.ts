@@ -9,7 +9,7 @@ export async function saveLevel(
 ): Promise<void> {
 	const { success } = await db
 		.prepare(
-			`INSERT INTO levels (name, desc, author_id, created, difficulty, data) VALUES (?, ?, ?, ?, ?, ?)`,
+			`INSERT INTO levels (name, desc, author_id, created, difficulty, data, mode) VALUES (?, ?, ?, ?, ?, ?, ?)`,
 		)
 		.bind(
 			level.name,
@@ -18,6 +18,7 @@ export async function saveLevel(
 			Date.now(),
 			level.difficulty ?? null,
 			level.data,
+			level.mode ?? null,
 		)
 		.run()
 
