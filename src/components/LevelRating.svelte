@@ -11,9 +11,11 @@
 	let error = $state<string>()
 
 	let myCurrentVote = $state(myVote)
+	let myExpectedVote = $state(myVote)
 
 	async function save(newVote: 0 | 1 | -1) {
 		error = undefined
+		myExpectedVote = newVote
 
 		const url = new URL('/api/levels/vote', window.location.href)
 		url.searchParams.set('level_id', String(levelId))
@@ -24,7 +26,7 @@
 			error = 'Beim Speichern der Bewertung ist ein Fehler aufgetreten.'
 		}
 		votes = (await result.json()).votes
-		myCurrentVote = newVote
+		myCurrentVote = myExpectedVote = newVote
 	}
 </script>
 
@@ -42,7 +44,7 @@
 			viewBox="0 0 24 24"
 			xmlns="http://www.w3.org/2000/svg"
 			class="down"
-			class:active={myCurrentVote === -1}
+			class:active={myExpectedVote === -1}
 		>
 			<path
 				fill="currentColor"
@@ -67,7 +69,7 @@
 			viewBox="0 0 24 24"
 			xmlns="http://www.w3.org/2000/svg"
 			class="up"
-			class:active={myCurrentVote === 1}
+			class:active={myExpectedVote === 1}
 		>
 			<path
 				fill="currentColor"

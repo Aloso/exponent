@@ -41,5 +41,6 @@
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 1rem;
+		margin-bottom: 3rem;
 	}
 </style>

@@ -106,7 +106,7 @@
 				{#if levelData.desc}
 					<p class="desc">{levelData.desc}</p>
 				{/if}
-				{#if levelData.difficulty !== undefined}
+				{#if levelData.difficulty != null}
 					<p>
 						Schwierigkeitsgrad: <em>{levelData.difficulty}</em> <span class="faded">/ 10</span>
 					</p>
