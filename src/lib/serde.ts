@@ -2,7 +2,7 @@ import type { Level, LevelRule } from './levels'
 import { defaultMode, fibMode, logarithmicMode } from './modes'
 import { parsePosition } from './parse'
 import type { Pos } from './position'
-import type { Square } from './square'
+import type { Block, Square } from './square'
 
 export interface SerialLevel {
 	name: string
@@ -10,6 +10,7 @@ export interface SerialLevel {
 	goal: Level['goal']
 	mode: string
 	hidden?: boolean
+	gen?: Block[]
 }
 
 export function serializeB64(level: Level): string {
@@ -43,13 +44,7 @@ function serializeSquare(square: Square): string {
 	let output: string
 	switch (square.variant) {
 		case 'normal':
-			if (square.effects?.includes('black-hole')) {
-				output = 'b'
-			} else if (square.goal) {
-				output = 'g' + square.goal
-			} else {
-				output = 'n'
-			}
+			output = square.goal ? 'g' + square.goal : 'n'
 			break
 		case 'empty':
 			output = '-'
@@ -60,9 +55,12 @@ function serializeSquare(square: Square): string {
 		case 'mouth':
 			output = 'm' + (square.direction?.[0] ?? '')
 			break
+		case 'black-hole':
+			output = 'b'
+			break
 	}
-	if (square.num) {
-		output += '+' + square.num
+	if (square.block) {
+		output += (square.block.antimatter ? '+!' : '+') + square.block.num
 	}
 	return output
 }
@@ -71,6 +69,7 @@ function deserializeRulesAndTargetFields(level: SerialLevel, pos: Pos): [LevelRu
 	const rules: LevelRule[] = []
 	rules.push(level.mode as 'default' | 'logarithmic' | 'fibonacchi')
 	if (level.hidden) rules.push('hidden')
+	if (level.gen?.some((b) => b.antimatter)) rules.push('antimatter')
 
 	let hasEmpty = false
 	let hasWalls = false
@@ -85,9 +84,6 @@ function deserializeRulesAndTargetFields(level: SerialLevel, pos: Pos): [LevelRu
 					hasEmpty = true
 					break
 				case 'normal':
-					if (square.effects?.includes('black-hole')) {
-						hasBlackHoles = true
-					}
 					if (square.goal) {
 						targetFields++
 					}
@@ -97,6 +93,9 @@ function deserializeRulesAndTargetFields(level: SerialLevel, pos: Pos): [LevelRu
 					break
 				case 'mouth':
 					hasMouths = true
+					break
+				case 'black-hole':
+					hasBlackHoles = true
 			}
 		}
 	}
@@ -111,12 +110,23 @@ function deserializeRulesAndTargetFields(level: SerialLevel, pos: Pos): [LevelRu
 }
 
 function deserializeLevel(level: SerialLevel, encoded: string): Level {
-	const mode =
+	let mode =
 		level.mode === 'default'
 			? defaultMode
 			: level.mode === 'logarithmic'
 				? logarithmicMode
 				: fibMode
+	if (level.hidden) {
+		mode = { ...mode, hidden: true }
+	}
+	if (level.gen) {
+		const gen = level.gen
+		mode.create = () => {
+			const r = (Math.random() * gen.length) | 0
+			return gen[r] ?? gen[0]
+		}
+	}
+
 	const pos = parsePosition(level.pos)
 	const [rules, targetFields] = deserializeRulesAndTargetFields(level, pos)
 
@@ -126,7 +136,7 @@ function deserializeLevel(level: SerialLevel, encoded: string): Level {
 		name: level.name,
 		pos: pos,
 		goal: targetFields > 0 ? { fields: targetFields } : level.goal,
-		mode: level.hidden ? { ...mode, hidden: true } : mode,
+		mode: mode,
 		rules: rules,
 	}
 }

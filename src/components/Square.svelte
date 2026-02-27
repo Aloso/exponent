@@ -10,13 +10,13 @@
 	}
 
 	let { square, mode, highlights, onclick }: Props = $props()
-	let label = $derived(squareLabel(square.num))
+	let label = $derived(squareLabel(square.block?.num))
 
 	interface OldSquare {
 		num: number
 		label: string
 		color: string
-		animation: { kind: 'move' | 'move-vanish'; x: number; y: number }
+		animation: { kind: 'move' | 'move-vanish'; x: number; y: number; antimatter?: boolean }
 	}
 
 	let oldSquares = $derived.by<OldSquare[]>(() => {
@@ -27,12 +27,54 @@
 				num: old.num,
 				label: squareLabel(old.num),
 				color: mode.getColor(old.num),
-				animation: { kind: ani.kind === 'merge' ? 'move' : 'move-vanish', x: old.x, y: old.y },
+				animation: {
+					kind: ani.kind === 'merge' && square.block ? 'move' : 'move-vanish',
+					x: old.x,
+					y: old.y,
+					antimatter: old.antimatter,
+				},
 			}))
 		} else {
 			return []
 		}
 	})
+
+	function appear(elem: HTMLElement, fast = false) {
+		const ani = elem.animate(
+			[
+				{ transform: 'scale(0)', opacity: 0.5 },
+				{ transform: 'scale(0)', opacity: 0.5, offset: fast ? 0.5 : 0.6 },
+				{ transform: 'scale(1)' },
+			],
+			{ easing: 'ease-out', duration: fast ? 250 : 500, iterations: 1, fill: 'forwards' },
+		)
+		return () => ani.cancel()
+	}
+
+	function move(elem: HTMLElement, origin: { x: number; y: number }) {
+		const ani = elem.animate(
+			[
+				{ transform: `translate(${origin.x * 100}%, ${origin.y * 100}%)`, zIndex: 1 },
+				{ transform: 'translate(0, 0)', zIndex: 1, offset: 0.99 },
+				{ zIndex: 0 },
+			],
+			{ easing: 'ease', duration: 200, fill: 'forwards' },
+		)
+		return () => ani.cancel()
+	}
+
+	function moveVanish(elem: HTMLElement, origin: { x: number; y: number }) {
+		const transform = `translate(${origin.x * 100}%, ${origin.y * 100}%) scale(1)`
+		const ani = elem.animate(
+			[
+				{ transform, opacity: 1, zIndex: 1 },
+				{ transform: 'translate(0, 0) scale(1)', opacity: 1, zIndex: 1 },
+				{ transform: 'translate(0, 0) scale(0)', opacity: 0, zIndex: 0 },
+			],
+			{ easing: 'ease', duration: 400, fill: 'forwards' },
+		)
+		return () => ani.cancel()
+	}
 </script>
 
 <button class="square-bg" class:empty={square.variant === 'empty'} style={highlights} {onclick}>
@@ -43,8 +85,17 @@
 	{#each oldSquares as old}
 		<div
 			class="square d{old.label.length} full"
-			data-ani={old.animation.kind}
-			style="--ani-x: {old.animation.x}; --ani-y: {old.animation.y}; --color: {old.color}"
+			class:antimatter={old.animation.antimatter}
+			class:foreground={old.animation.kind === 'move-vanish'}
+			style="--color: {old.color}"
+			{@attach (elem) => {
+				switch (old.animation.kind) {
+					case 'move':
+						return move(elem, old.animation)
+					case 'move-vanish':
+						return moveVanish(elem, old.animation)
+				}
+			}}
 		>
 			{old.label}
 		</div>
@@ -52,16 +103,25 @@
 
 	<div
 		class="square d{label.length}"
-		class:full={square.num !== undefined}
+		class:full={square.block !== undefined}
 		class:wall={square.variant === 'wall'}
-		class:black-hole={!!square.effects?.includes('black-hole')}
+		class:black-hole={square.variant === 'black-hole'}
 		class:mouth={square.variant === 'mouth'}
-		data-ani={oldSquares.length === 2 ? 'appear-merge' : square.animation?.kind}
+		class:antimatter={square.block?.antimatter}
+		class:foreground={oldSquares.length === 2}
 		data-direction={square.direction}
-		style="{square.num ? `--color: ${mode.getColor(square.num)};` : ''}
-		{square.animation?.kind === 'move'
-			? `--ani-x: ${square.animation.x}; --ani-y: ${square.animation.y}`
-			: ''}"
+		style={square.block ? `--color: ${mode.getColor(square.block.num)};` : ''}
+		{@attach (elem) => {
+			if (square.animation) {
+				if (oldSquares.length === 2) return appear(elem, true)
+				switch (square.animation.kind) {
+					case 'appear':
+						return appear(elem)
+					case 'move':
+						return move(elem, square.animation)
+				}
+			}
+		}}
 	>
 		{label}
 	</div>
@@ -127,6 +187,11 @@
 			background-color: var(--color, #fff3);
 			box-shadow: inset 0 -0.5rem 0 #00000017;
 
+			&.antimatter {
+				filter: invert(1);
+				box-shadow: inset 0 0 0 0.5rem #0007;
+			}
+
 			:global(.small) & {
 				box-shadow: inset 0 -0.25rem 0 #00000017;
 				border-radius: 0.15rem;
@@ -150,18 +215,7 @@
 			background: squares.$black_hole_bg;
 		}
 
-		&[data-ani='move'] {
-			animation: move 0.2s ease forwards;
-		}
-		&[data-ani='move-vanish'] {
-			animation: move-vanish 0.4s ease forwards;
-			z-index: 2;
-		}
-		&[data-ani='appear'] {
-			animation: appear 0.5s ease-out forwards;
-		}
-		&[data-ani='appear-merge'] {
-			animation: appear-fast 0.25s ease-out forwards;
+		&.foreground {
 			z-index: 2;
 		}
 
@@ -180,66 +234,6 @@
 			}
 			&[data-direction='right'] {
 				transform: rotate(225deg) !important;
-			}
-		}
-
-		@keyframes appear-fast {
-			0% {
-				transform: scale(0);
-				opacity: 0.5;
-			}
-			50% {
-				transform: scale(0);
-				opacity: 0.5;
-			}
-			100% {
-				transform: scale(1);
-			}
-		}
-
-		@keyframes appear {
-			0% {
-				transform: scale(0);
-				opacity: 0.5;
-			}
-			60% {
-				transform: scale(0);
-				opacity: 0.5;
-			}
-			100% {
-				transform: scale(1);
-			}
-		}
-
-		@keyframes move {
-			0% {
-				transform: translate(calc(var(--ani-x) * 100%), calc(var(--ani-y) * 100%));
-				z-index: 1;
-			}
-			99% {
-				transform: translate(0, 0);
-				z-index: 1;
-			}
-			100% {
-				z-index: 0;
-			}
-		}
-
-		@keyframes move-vanish {
-			0% {
-				transform: translate(calc(var(--ani-x) * 100%), calc(var(--ani-y) * 100%)) scale(1);
-				opacity: 1;
-				z-index: 1;
-			}
-			50% {
-				transform: translate(0, 0) scale(1);
-				opacity: 1;
-				z-index: 1;
-			}
-			100% {
-				transform: translate(0, 0) scale(0);
-				opacity: 0;
-				z-index: 1;
 			}
 		}
 

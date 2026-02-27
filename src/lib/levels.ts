@@ -1,6 +1,6 @@
 import type { Component } from 'svelte'
 import Tutorial1 from '../levels/Tutorial1.svelte'
-import { appState } from './appState.svelte'
+import { appState, saveConfig } from './appState.svelte'
 import type { Pos } from './position'
 import type Field from '../components/Field.svelte'
 import { parsePosition } from './parse'
@@ -30,6 +30,7 @@ export type LevelRule =
 	| 'fibonacchi'
 	| 'tutorial'
 	| 'hidden'
+	| 'antimatter'
 	| 'empty'
 	| 'walls'
 	| 'black-holes'
@@ -269,7 +270,51 @@ export const levels: Level[] = [
 		mode: { ...defaultMode, hidden: true },
 		rules: ['default', 'hidden'],
 	},
+	{
+		id: 'alternate',
+		number: 15,
+		name: 'Mischung',
+		pos: parsePosition(
+			`n n n n
+			n n n n
+			n n n n+3
+			n n n n
+			n n n n`,
+		),
+		goal: 64,
+		mode: {
+			...defaultMode,
+			create() {
+				return { num: Math.random() < 0.5 ? 2 : 3 }
+			},
+		},
+		rules: ['default'],
+	},
+	{
+		id: 'antimatter',
+		number: 16,
+		name: 'Antimaterie',
+		pos: parsePosition(
+			`n n n n
+			n n n n
+			X X X n+!2
+			n n n n
+			n n n n`,
+		),
+		goal: 64,
+		mode: {
+			...defaultMode,
+			create() {
+				return { num: 2, antimatter: Math.random() < 0.5 ? true : undefined }
+			},
+		},
+		rules: ['default', 'antimatter'],
+	},
 ]
+;(globalThis as any).cheat = () => {
+	appState.completedLevels = levels.map((lvl) => ({ id: lvl.id, timestamp: 0 }))
+	saveConfig()
+}
 
 export function getNextLevel() {
 	if (!appState.initialized) return

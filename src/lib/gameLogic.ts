@@ -23,9 +23,9 @@ export function gameLogic(mode: LevelMode, squares: Square[][], direction: Direc
 			} else if (tail.variant === 'mouth') {
 				if (tail.direction !== direction || head.variant === 'wall' || head.variant === 'mouth') {
 					incTail()
-				} else if (head.num !== undefined) {
-					const old: SquareAnimationOld = { ...moveAnimation(hx - tx, hy - ty), num: head.num }
-					head.num = undefined
+				} else if (head.block !== undefined) {
+					const old: SquareAnimationOld = { ...moveAnimation(hx - tx, hy - ty), ...head.block }
+					head.block = undefined
 					if (tail.animation && tail.animation.kind === 'vanish') {
 						tail.animation.old.push(old)
 					} else {
@@ -38,34 +38,34 @@ export function gameLogic(mode: LevelMode, squares: Square[][], direction: Direc
 				}
 			} else if (head.variant === 'mouth') {
 				incTail()
-			} else if (head.num !== undefined) {
-				if (tail.num === undefined) {
+			} else if (head.block !== undefined) {
+				if (tail.block === undefined) {
 					if (tail.variant === 'normal') {
-						// move or vanish
-						if (tail.effects?.includes('black-hole')) {
-							const oldNum = head.num
-							tail.animation = {
-								kind: 'vanish',
-								old: [{ ...moveAnimation(hx - tx, hy - ty), num: oldNum }],
-							}
-							incTail()
-						} else {
-							tail.num = head.num
-							tail.animation = { kind: 'move', ...moveAnimation(hx - tx, hy - ty) }
-						}
-						head.num = undefined
+						tail.block = head.block
+						tail.animation = { kind: 'move', ...moveAnimation(hx - tx, hy - ty) }
+						head.block = undefined
 						moves++
+						incHead()
+					} else if (tail.variant === 'black-hole') {
+						const oldBlock = head.block
+						tail.animation = {
+							kind: 'vanish',
+							old: [{ ...moveAnimation(hx - tx, hy - ty), ...oldBlock }],
+						}
+						head.block = undefined
+						moves++
+						incTail()
 						incHead()
 					} else {
 						incTail()
 					}
 				} else {
-					const combined = mode.combine(head.num, tail.num)
-					if (combined !== undefined && !tail.effects?.includes('black-hole')) {
+					const combined = mode.combine(head.block, tail.block)
+					if (combined !== undefined && tail.variant !== 'black-hole') {
 						// merge
-						const headNum = head.num
-						const tailNum = tail.num
-						tail.num = combined
+						const headNum = head.block
+						const tailNum = tail.block
+						tail.block = combined === 'destroy' ? undefined : combined
 
 						let x2 = 0,
 							y2 = 0
@@ -73,16 +73,15 @@ export function gameLogic(mode: LevelMode, squares: Square[][], direction: Direc
 							x2 = tail.animation.x
 							y2 = tail.animation.y
 						}
-						const move = moveAnimation(hx - tx, hy - ty)
 						tail.animation = {
 							kind: 'merge',
 							old: [
-								{ ...move, num: headNum },
-								{ x: x2, y: y2, num: tailNum },
+								{ ...moveAnimation(hx - tx, hy - ty), ...headNum },
+								{ x: x2, y: y2, ...tailNum },
 							],
 						}
 
-						head.num = undefined
+						head.block = undefined
 						moves++
 						incHead()
 						incTail()
@@ -117,7 +116,7 @@ export function finishMoveAndAddNumber(
 	}
 
 	const idx = (Math.random() * state.available.length) | 0
-	state.available[idx].num = mode.create()
+	state.available[idx].block = mode.create()
 	state.available[idx].animation = { kind: 'appear' }
 
 	if (state.available.length === 1) {
@@ -145,7 +144,7 @@ export function checkGameState(
 	let highestNumber = 0
 	for (const row of squares) {
 		for (const square of row) {
-			highestNumber = Math.max(highestNumber, square.num ?? 0)
+			highestNumber = Math.max(highestNumber, square.block?.num ?? 0)
 		}
 	}
 	if (typeof goal === 'number' && highestNumber >= goal) {
@@ -155,7 +154,7 @@ export function checkGameState(
 	}
 
 	const availableFields = squares.flatMap((row) =>
-		row.filter((s) => s.num === undefined && s.variant === 'normal' && !s.effects?.length),
+		row.filter((s) => s.block === undefined && s.variant === 'normal'),
 	)
 
 	if (availableFields.length > 0) {
@@ -173,5 +172,5 @@ function moveAnimation(x: number, y: number) {
 }
 
 function squareIsWon(square: Square) {
-	return !square.goal || (square.num && square.num >= square.goal)
+	return !square.goal || (square.block && square.block.num >= square.goal)
 }

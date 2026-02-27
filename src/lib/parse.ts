@@ -46,27 +46,30 @@ function parseSquare(squareString: string, id: number): Square {
 			output = { variant: 'wall', id }
 			break
 		case 'b':
-			output = { variant: 'normal', id, effects: ['black-hole'] }
+			output = { variant: 'black-hole', id }
 			break
 		case 'm':
-			output = { variant: 'mouth', id, direction: parseDirection(squareString[1]) }
+			output = { variant: 'mouth', id, direction: parseDirection(before[1]) }
 			break
 		case 'g':
-			output = { variant: 'normal', goal: Number.parseInt(squareString.slice(1)), id }
+			output = { variant: 'normal', goal: Number.parseInt(before.slice(1)), id }
 			break
 		default:
 			throw new Error(`invalid square: '${before}'`)
 	}
 
 	if (after) {
-		const num = Number.parseInt(after)
+		const antimatter = after.startsWith('!')
+		const rest = antimatter ? after.slice(1) : after
+
+		const num = Number.parseInt(rest)
 		if (Number.isNaN(num)) {
 			throw new Error('Invalid number')
 		}
 		if (output.variant !== 'normal') {
 			throw new Error(`Can't add number to ${output.variant} square`)
 		}
-		output.num = num
+		output.block = antimatter ? { num, antimatter } : { num }
 	}
 	return output
 }

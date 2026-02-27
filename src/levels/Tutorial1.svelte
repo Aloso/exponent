@@ -29,9 +29,9 @@
 						n n n n
 						n n n n`,
 						(pos) => {
-							pos.squares[2][3].num = 2
+							pos.squares[2][3].block = { num: 2 }
 							pos.squares[2][3].animation = { kind: 'move', x: -1, y: 0 }
-							pos.squares[0][3].num = 2
+							pos.squares[0][3].block = { num: 2 }
 							pos.squares[0][3].animation = { kind: 'appear' }
 						},
 					)
@@ -39,7 +39,7 @@
 				} else if (step === 2) {
 					setTimeout(() => step++, 500)
 				} else if (step === 3) {
-					if (event.newPos.squares.some((row) => row.some((s) => s.num === 16))) {
+					if (event.newPos.squares.some((row) => row.some((s) => s.block?.num === 16))) {
 						setTimeout(() => step++, 500)
 					}
 				}
@@ -62,15 +62,15 @@
 			case 1:
 				field.setPos(
 					update(emptyPos, (pos) => {
-						pos.squares[2][2].num = 2
+						pos.squares[2][2].block = { num: 2 }
 					}),
 				)
 				break
 			case 2:
 				field.setPos(
 					update(emptyPos, (pos) => {
-						pos.squares[2][3].num = 2
-						pos.squares[0][3].num = 2
+						pos.squares[2][3].block = { num: 2 }
+						pos.squares[0][3].block = { num: 2 }
 					}),
 				)
 				break

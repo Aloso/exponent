@@ -4,7 +4,7 @@
 	import { defaultMode, fibMode, logarithmicMode } from '$lib/modes'
 	import { parsePosition } from '$lib/parse'
 	import { serializeB64 } from '$lib/serde'
-	import type { Square } from '$lib/square'
+	import type { Block, Square } from '$lib/square'
 	import Field from '../../components/Field.svelte'
 	import Header from '../../components/Header.svelte'
 	import SquareComponent from '../../components/Square.svelte'
@@ -25,7 +25,7 @@
 	let selected = $state<[number, number]>()
 	let fieldType = $state<FieldType>()
 	let fieldDirection = $state<Direction>('left')
-	let fieldNumber = $state<number>()
+	let fieldBlock = $state<Block>()
 	let fieldTarget = $state<number>()
 
 	let globalMode = $state<'default' | 'logarithmic' | 'fibonacchi'>('default')
@@ -40,7 +40,7 @@
 		let { squares } = level.pos
 		for (const field of squares.flat()) {
 			if (field.goal !== undefined) goals += 1
-			if (field.num !== undefined) numbers += 1
+			if (field.block !== undefined) numbers += 1
 		}
 
 		if (numbers === 0) {
@@ -93,40 +93,25 @@
 				switch (nextFieldType) {
 					case 'normal':
 						square.variant = nextFieldType
-						square.effects = undefined
 						square.direction = undefined
 						break
 					case 'empty':
-						square.variant = nextFieldType
-						square.effects = undefined
-						square.direction = undefined
-						square.goal = undefined
-						square.num = undefined
-						break
 					case 'wall':
+					case 'black-hole':
 						square.variant = nextFieldType
-						square.effects = undefined
 						square.direction = undefined
 						square.goal = undefined
-						square.num = undefined
+						square.block = undefined
 						break
 					case 'mouth':
 						square.variant = nextFieldType
-						square.effects = undefined
 						square.direction = square.direction ?? fieldDirection
 						square.goal = undefined
-						square.num = undefined
-						break
-					case 'black-hole':
-						square.variant = 'normal'
-						square.effects = ['black-hole']
-						square.direction = undefined
-						square.goal = undefined
-						square.num = undefined
+						square.block = undefined
 						break
 				}
 
-				fieldNumber = square.num
+				fieldBlock = square.block
 				fieldTarget = square.goal
 			}
 		})
@@ -144,12 +129,12 @@
 	})
 
 	$effect(() => {
-		let nextFieldNumber = fieldNumber
+		let nextFieldBlock = fieldBlock
 		queueMicrotask(() => {
 			if (selected) {
 				const [x, y] = selected
 				const square = level.pos.squares[y][x]
-				square.num = nextFieldNumber
+				square.block = nextFieldBlock
 			}
 		})
 	})
@@ -173,13 +158,13 @@
 				} else {
 					selected = [event.x, event.y]
 					const square = level.pos.squares[event.y][event.x]
-					const { direction, goal, num } = square
-					fieldType = getFieldType(square)
+					const { direction, goal, block } = square
+					fieldType = square.variant
 					if (direction) {
 						fieldDirection = direction
 					}
 					fieldTarget = goal
-					fieldNumber = num
+					fieldBlock = block
 				}
 				return event
 			})
@@ -195,14 +180,6 @@
 		result[y][x] = 'outline: 0.25rem solid white'
 		return result
 	})
-
-	function getFieldType(square: Square): FieldType {
-		if (square.effects?.includes('black-hole')) {
-			return 'black-hole'
-		} else {
-			return square.variant
-		}
-	}
 </script>
 
 <!-- TODO: Reset action -->
@@ -258,7 +235,7 @@
 			/>
 			<SquareComponent
 				mode={level.mode}
-				square={{ id: 0, variant: 'normal', effects: ['black-hole'] }}
+				square={{ id: 0, variant: 'black-hole' }}
 				highlights={fieldType === 'black-hole' ? 'outline: white solid 0.2rem' : undefined}
 				onclick={() => (fieldType = 'black-hole')}
 			/>
@@ -284,12 +261,12 @@
 				<label>
 					<input
 						type="checkbox"
-						checked={fieldNumber !== undefined}
-						onchange={(e) => (fieldNumber = e.currentTarget.checked ? 2 : undefined)}
+						checked={fieldBlock !== undefined}
+						onchange={(e) => (fieldBlock = e.currentTarget.checked ? { num: 2 } : undefined)}
 					/>
 					<em>Zahl zu Beginn</em>
-					{#if fieldNumber !== undefined}
-						<input class="small-number" type="number" bind:value={fieldNumber} />
+					{#if fieldBlock !== undefined}
+						<input class="small-number" type="number" bind:value={fieldBlock} />
 					{:else}
 						<input class="small-number" type="number" disabled />
 					{/if}

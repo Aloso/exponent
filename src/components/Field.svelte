@@ -27,18 +27,12 @@
 
 	let { small, level, noGestures, highlights }: Props = $props()
 
-	let pos = $state(level.pos)
-	let lastPos = $state(level.pos)
+	let pos = $derived(level.pos)
+	let lastPos = $derived(level.pos)
 	let lastMoveTime = 0
-	let goal = $state(level.goal)
+	let goal = $derived(level.goal)
 
 	let clientWidth = $state(480)
-
-	$effect(() => {
-		pos = level.pos
-		lastPos = level.pos
-		goal = level.goal
-	})
 
 	$effect(() => {
 		console.log(printPos(pos))

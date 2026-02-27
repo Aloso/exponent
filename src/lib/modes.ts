@@ -1,8 +1,10 @@
+import type { Block } from './square'
+
 export interface LevelMode {
 	id: string
 	getColor: (n: number) => string
-	combine: (a: number, b: number) => number | undefined
-	create: () => number
+	combine: (a: Block, b: Block) => Block | undefined | 'destroy'
+	create: () => Block
 	hidden?: boolean
 }
 
@@ -24,34 +26,59 @@ const colors = [
 	'#ef0c6c',
 ]
 
+const altColors = [
+	'#888888',
+	'#63abf7',
+	'#63def7',
+	'#4af778',
+	'#9bf74a',
+	'#f5e63a',
+	'#f59b3a',
+	'#fc669a',
+	'#ed7bea',
+	'#9451f3',
+	'#2e2aee',
+	'#0b57ef',
+	'#248eff',
+	'#10dafb',
+	'#10f393',
+]
+
 const powersOfTwo: Map<number, number> = new Map()
 for (let i = 0; i < 15; i++) {
 	powersOfTwo.set(2 ** i, i)
 }
 
+const powersOfThree: Map<number, number> = new Map()
+for (let i = 0; i < 15; i++) {
+	powersOfThree.set(1.5 * 2 ** i, i)
+}
+
 export const defaultMode: LevelMode = {
 	id: 'default',
 	combine(a, b) {
-		return a === b ? a + b : undefined
+		if (a.antimatter !== b.antimatter) return 'destroy'
+		return a.num === b.num ? { num: a.num + b.num, antimatter: a.antimatter } : undefined
 	},
 	getColor(n) {
-		return colors[powersOfTwo.get(n) ?? 0]
+		return colors[powersOfTwo.get(n) as number] ?? altColors[powersOfThree.get(n) as number] ?? 0
 	},
 	create() {
-		return 2
+		return { num: 2 }
 	},
 }
 
 export const logarithmicMode: LevelMode = {
 	id: 'logarithmic',
 	combine(a, b) {
-		return a === b ? a + 1 : undefined
+		if (a.antimatter !== b.antimatter) return 'destroy'
+		return a.num === b.num ? { num: a.num + 1, antimatter: a.antimatter } : undefined
 	},
 	getColor(n) {
 		return colors[n]
 	},
 	create() {
-		return 1
+		return { num: 1 }
 	},
 }
 
@@ -60,13 +87,16 @@ const fibSequence = createFibSequence(30)
 export const fibMode: LevelMode = {
 	id: 'fibonacchi',
 	combine(a, b) {
-		return (a === 1 && b === 1) || Math.abs(reverseFib(a) - reverseFib(b)) === 1 ? a + b : undefined
+		if (a.antimatter !== b.antimatter) return 'destroy'
+		return (a.num === 1 && b.num === 1) || Math.abs(reverseFib(a.num) - reverseFib(b.num)) === 1
+			? { num: a.num + b.num, antimatter: a.antimatter }
+			: undefined
 	},
 	getColor(n) {
 		return colors[fibSequence.get(n) ?? 0]
 	},
 	create() {
-		return 1
+		return { num: 1 }
 	},
 }
 

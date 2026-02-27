@@ -10,8 +10,8 @@
 	let { small, levelId, votes, myVote, canVote }: Props = $props()
 	let error = $state<string>()
 
-	let myCurrentVote = $state(myVote)
-	let myExpectedVote = $state(myVote)
+	let myCurrentVote = $derived(myVote)
+	let myExpectedVote = $derived(myVote)
 
 	async function save(newVote: 0 | 1 | -1) {
 		error = undefined

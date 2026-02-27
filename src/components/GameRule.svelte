@@ -25,6 +25,11 @@
 				return ['Tutorial', 'Dieser Level ist nur zur Erklärung.']
 			case 'hidden':
 				return ['Versteckte Zahlen', 'Hoffentlich erinnerst du dich an die Reihenfolge der Farben.']
+			case 'antimatter':
+				return [
+					'Antimaterie',
+					'Wenn eine normale Zahl mit einer Antimaterie-Zahl kombiniert wird, löschen sie sich aus!',
+				]
 			case 'empty':
 				return ['Lücken', 'Das Raster hat Lücken, diese werden von Zahlen übersprungen.']
 			case 'walls':
