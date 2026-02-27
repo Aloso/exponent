@@ -4,7 +4,7 @@ import { appState, saveConfig } from './appState.svelte'
 import type { Pos } from './position'
 import type Field from '../components/Field.svelte'
 import { parsePosition } from './parse'
-import { defaultMode, fibMode, logarithmicMode, type LevelMode } from './modes'
+import { defaultMode, ezMode, fibMode, logarithmicMode, type LevelMode } from './modes'
 
 export interface LevelOverlayProps {
 	pos: Pos
@@ -36,6 +36,7 @@ export type LevelRule =
 	| 'black-holes'
 	| 'target-fields'
 	| 'mouths'
+	| '20ez'
 
 export const emptyPos = parsePosition(
 	`n n n n
@@ -309,6 +310,20 @@ export const levels: Level[] = [
 			},
 		},
 		rules: ['default', 'antimatter'],
+	},
+	{
+		id: '20ez',
+		number: 17,
+		name: '2048 easy version?',
+		pos: parsePosition(
+			`n n n n
+			n n n n
+			n n+2 n n
+			n n n n`,
+		),
+		goal: 2048,
+		mode: ezMode,
+		rules: ['20ez'],
 	},
 ]
 ;(globalThis as any).cheat = () => {

@@ -115,9 +115,12 @@ export function finishMoveAndAddNumber(
 		return state
 	}
 
-	const idx = (Math.random() * state.available.length) | 0
-	state.available[idx].block = mode.create()
-	state.available[idx].animation = { kind: 'appear' }
+	const created = mode.create(squares)
+	if (created) {
+		const idx = (Math.random() * state.available.length) | 0
+		state.available[idx].block = created
+		state.available[idx].animation = { kind: 'appear' }
+	}
 
 	if (state.available.length === 1) {
 		// field is full after this move
@@ -173,4 +176,21 @@ function moveAnimation(x: number, y: number) {
 
 function squareIsWon(square: Square) {
 	return !square.goal || (square.block && square.block.num >= square.goal)
+}
+
+interface SelectedCell {
+	x: number
+	y: number
+	number: undefined
+	variant: 'normal'
+}
+
+export function randomAvailableCell(squares: Square[][]): SelectedCell {
+	const available = squares.flatMap((row, y) =>
+		row
+			.map((s, x) => ({ x, y, number: s.block?.num, variant: s.variant }))
+			.filter((s): s is SelectedCell => s.number === undefined && s.variant === 'normal'),
+	)
+	const idx = (Math.random() * available.length) | 0
+	return available[idx]
 }

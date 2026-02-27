@@ -1,10 +1,11 @@
-import type { Block } from './square'
+import { randomAvailableCell } from './gameLogic'
+import type { Block, Square } from './square'
 
 export interface LevelMode {
 	id: string
 	getColor: (n: number) => string
 	combine: (a: Block, b: Block) => Block | undefined | 'destroy'
-	create: () => Block
+	create: (squares: Square[][]) => Block | void
 	hidden?: boolean
 }
 
@@ -61,7 +62,9 @@ export const defaultMode: LevelMode = {
 		return a.num === b.num ? { num: a.num + b.num, antimatter: a.antimatter } : undefined
 	},
 	getColor(n) {
-		return colors[powersOfTwo.get(n) as number] ?? altColors[powersOfThree.get(n) as number] ?? 0
+		return (
+			colors[powersOfTwo.get(n) as number] ?? altColors[powersOfThree.get(n) as number] ?? '#8a518a'
+		)
 	},
 	create() {
 		return { num: 2 }
@@ -97,6 +100,45 @@ export const fibMode: LevelMode = {
 	},
 	create() {
 		return { num: 1 }
+	},
+}
+
+export const ezMode: LevelMode = {
+	id: '20ez',
+	combine: defaultMode.combine,
+	getColor: defaultMode.getColor,
+	create(squares) {
+		let bvalue = 2_147_483_647
+		let bcell = randomAvailableCell(squares)
+
+		for (let i = 0; i < 8; i++) {
+			const cell = randomAvailableCell(squares)
+
+			function check(x: number, y: number, dx: number, dy: number) {
+				const tocheck = squares[cell.y + y]?.[cell.x + x]
+				if (!tocheck) return
+
+				if (tocheck.block) {
+					if (Math.random() < 0.8 && tocheck.block.num < bvalue) {
+						bcell = cell
+						bvalue = tocheck.block.num
+					}
+				} else if (tocheck.variant !== 'wall' && tocheck.variant !== 'mouth') {
+					check(x + dx, y + dy, dx, dy)
+				}
+			}
+
+			check(1, 0, 1, 0) // go right
+			check(0, 1, 0, 1) // go down
+
+			if (bvalue == 2_147_483_647) {
+				bvalue = 2
+			}
+		}
+
+		const square = squares[bcell.y][bcell.x]
+		square.block = { num: bvalue }
+		square.animation = { kind: 'appear' }
 	},
 }
 

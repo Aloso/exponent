@@ -13,6 +13,8 @@
 				return 'fib'
 			case 'logarithmic':
 				return 'loga'
+			case '20ez':
+				return '20ez'
 		}
 	})
 </script>

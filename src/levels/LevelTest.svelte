@@ -18,7 +18,7 @@
 
 	let { level, loggedIn, cheat }: Props = $props()
 
-	let pos = $state(level.pos)
+	let pos = $derived(level.pos)
 	let field = $state<Field>()
 	let levelResult: 'won' | 'lost' | undefined = $state()
 	let saved = $derived(appState.currentLevel)

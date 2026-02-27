@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Direction } from '$lib/events'
 	import type { Level } from '$lib/levels'
-	import { defaultMode, fibMode, logarithmicMode } from '$lib/modes'
+	import { defaultMode, ezMode, fibMode, logarithmicMode } from '$lib/modes'
 	import { parsePosition } from '$lib/parse'
 	import { serializeB64 } from '$lib/serde'
 	import type { Block, Square } from '$lib/square'
@@ -28,7 +28,7 @@
 	let fieldBlock = $state<Block>()
 	let fieldTarget = $state<number>()
 
-	let globalMode = $state<'default' | 'logarithmic' | 'fibonacchi'>('default')
+	let globalMode = $state<'default' | 'logarithmic' | 'fibonacchi' | '20ez'>('default')
 	let globalSize = $state([4, 4])
 
 	let problems = $derived.by(() => {
@@ -65,7 +65,9 @@
 				? defaultMode
 				: globalMode === 'logarithmic'
 					? logarithmicMode
-					: fibMode
+					: globalMode === 'fibonacchi'
+						? fibMode
+						: ezMode
 		queueMicrotask(() => {
 			level.mode = level.mode.hidden ? { ...mode, hidden: true } : mode
 		})
@@ -298,6 +300,7 @@
 	<label><input type="radio" value="default" bind:group={globalMode} /> Normal</label>
 	<label><input type="radio" value="logarithmic" bind:group={globalMode} /> Logarithmisch</label>
 	<label><input type="radio" value="fibonacchi" bind:group={globalMode} /> Fibonacchi</label>
+	<label><input type="radio" value={'20ez'} bind:group={globalMode} /> 20ez</label>
 
 	<p>
 		<label>

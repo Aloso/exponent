@@ -1,5 +1,5 @@
 import type { Level, LevelRule } from './levels'
-import { defaultMode, fibMode, logarithmicMode } from './modes'
+import { defaultMode, ezMode, fibMode, logarithmicMode } from './modes'
 import { parsePosition } from './parse'
 import type { Pos } from './position'
 import type { Block, Square } from './square'
@@ -67,7 +67,7 @@ function serializeSquare(square: Square): string {
 
 function deserializeRulesAndTargetFields(level: SerialLevel, pos: Pos): [LevelRule[], number] {
 	const rules: LevelRule[] = []
-	rules.push(level.mode as 'default' | 'logarithmic' | 'fibonacchi')
+	rules.push(level.mode as 'default' | 'logarithmic' | 'fibonacchi' | '20ez')
 	if (level.hidden) rules.push('hidden')
 	if (level.gen?.some((b) => b.antimatter)) rules.push('antimatter')
 
@@ -115,7 +115,9 @@ function deserializeLevel(level: SerialLevel, encoded: string): Level {
 			? defaultMode
 			: level.mode === 'logarithmic'
 				? logarithmicMode
-				: fibMode
+				: level.mode === 'fibonacchi'
+					? fibMode
+					: ezMode
 	if (level.hidden) {
 		mode = { ...mode, hidden: true }
 	}

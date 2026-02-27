@@ -21,6 +21,12 @@
 					'Fibonacchi-Reihe',
 					'In der Fibonacchi-Reihe ist jede Zahl die Summe der zwei Zahlen davor: <em>1, 1, 2, 3, 5, 8, 13, 21, ...</em>. In diesem Modus können nur aufeinanderfolgende Fibonacchi-Zahlen kombiniert werden.',
 				]
+			case '20ez':
+				return [
+					'20ez',
+					'In diesem speziellen Spielmodus werden oft deutlich höhere Zahlen generiert. Die neue Zahl hängt davon ab, was sich rechts davon und darunter befindet. Probiere es aus!',
+				]
+
 			case 'tutorial':
 				return ['Tutorial', 'Dieser Level ist nur zur Erklärung.']
 			case 'hidden':

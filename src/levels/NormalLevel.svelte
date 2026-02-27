@@ -22,10 +22,10 @@
 
 	let me = $state<SafeUser>()
 
-	let currentName = $state(level.name)
-	let currentData = $state(levelData)
+	let currentName = $derived(level.name)
+	let currentData = $derived(levelData)
 
-	let pos = $state(level.pos)
+	let pos = $derived(level.pos)
 	let field = $state<Field>()
 	let levelResult: 'won' | 'lost' | undefined = $state()
 	let saved = $derived(appState.currentLevel)

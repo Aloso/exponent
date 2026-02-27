@@ -51,8 +51,16 @@ export function printSquare(square: Square): string {
 export function squareLabel(num?: number): string {
 	if (num === undefined) return ''
 	if (num > 16_000) {
-		const kilos = (num / 1000) | 0
-		return kilos + 'K'
+		if (num >= 1_000_000_000) {
+			const gigs = (num / 1_000_000_000) | 0
+			return gigs + 'G'
+		} else if (num >= 1_000_000) {
+			const mills = (num / 1_000_000) | 0
+			return mills + 'M'
+		} else {
+			const kilos = (num / 1000) | 0
+			return kilos + 'K'
+		}
 	} else {
 		return `${num}`
 	}
